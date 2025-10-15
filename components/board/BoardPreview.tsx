@@ -166,24 +166,41 @@ export default function BoardPreview({
           {/* カードデザインがある場合は薄いオーバーレイ */}
           {localCardSrc && <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }} />}
           
-          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center" style={{ paddingTop: '20px' }}>
             {mounted && localPhoto ? (
-              <img src={localPhoto} alt="" className="rounded-full object-cover mb-2" style={{ 
-                height: `${AVATAR_SIZE}px`, 
-                width: `${AVATAR_SIZE}px` 
-              }} />
+              <img 
+                src={localPhoto} 
+                alt="" 
+                className="rounded-full object-cover mb-2" 
+                style={{ 
+                  height: `${AVATAR_SIZE + 8}px`, 
+                  width: `${AVATAR_SIZE + 8}px`,
+                  border: '3px solid white',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                  position: 'absolute',
+                  top: '-10px'
+                }} 
+              />
             ) : (
-              <div className="rounded-full mb-2" style={{ 
-                height: `${AVATAR_SIZE}px`, 
-                width: `${AVATAR_SIZE}px`, 
-                backgroundColor: '#d1d5db' 
-              }} />
+              <div 
+                className="rounded-full mb-2" 
+                style={{ 
+                  height: `${AVATAR_SIZE + 8}px`, 
+                  width: `${AVATAR_SIZE + 8}px`, 
+                  backgroundColor: '#d1d5db',
+                  border: '3px solid white',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                  position: 'absolute',
+                  top: '-10px'
+                }} 
+              />
             )}
             <div className="font-semibold text-center mb-1 px-1" style={{ 
               color: '#000000', 
               lineHeight: '1.3', 
               wordBreak: 'break-all',
-              fontSize: `${FONT_SIZE_NAME}px`
+              fontSize: `${FONT_SIZE_NAME}px`,
+              marginTop: '8px'
             }}>
               {localRecipient}
             </div>
@@ -217,18 +234,34 @@ export default function BoardPreview({
             {/* カードデザインがある場合は薄いオーバーレイ */}
             {localCardSrc && <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }} />}
             
-            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center" style={{ paddingTop: '20px' }}>
               {message.photo ? (
-                <img src={message.photo} alt="" className="rounded-full object-cover mb-2" style={{ 
-                  height: `${AVATAR_SIZE}px`, 
-                  width: `${AVATAR_SIZE}px` 
-                }} />
+                <img 
+                  src={message.photo} 
+                  alt="" 
+                  className="rounded-full object-cover mb-2" 
+                  style={{ 
+                    height: `${AVATAR_SIZE + 8}px`, 
+                    width: `${AVATAR_SIZE + 8}px`,
+                    border: '3px solid white',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    position: 'absolute',
+                    top: '-10px'
+                  }} 
+                />
               ) : (
-                <div className="rounded-full mb-2 flex items-center justify-center" style={{ 
-                  height: `${AVATAR_SIZE}px`, 
-                  width: `${AVATAR_SIZE}px`, 
-                  backgroundColor: 'rgba(255,107,107,0.2)' 
-                }}>
+                <div 
+                  className="rounded-full mb-2 flex items-center justify-center" 
+                  style={{ 
+                    height: `${AVATAR_SIZE + 8}px`, 
+                    width: `${AVATAR_SIZE + 8}px`, 
+                    backgroundColor: 'rgba(255,107,107,0.2)',
+                    border: '3px solid white',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    position: 'absolute',
+                    top: '-10px'
+                  }}
+                >
                   <div className="rounded-full" style={{ 
                     height: `${AVATAR_SIZE / 2}px`, 
                     width: `${AVATAR_SIZE / 2}px`, 
@@ -240,7 +273,8 @@ export default function BoardPreview({
                 color: '#000000', 
                 lineHeight: '1.3', 
                 wordBreak: 'break-all',
-                fontSize: `${FONT_SIZE_NAME}px`
+                fontSize: `${FONT_SIZE_NAME}px`,
+                marginTop: '8px'
               }}>
                 {message.name}
               </div>
