@@ -63,50 +63,22 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
         </div>
       </div>
 
-      {/* 中央カードプレビュー */}
+      {/* 中央メッセージ表示（色紙に直接） */}
       <div className="absolute inset-0 flex items-center justify-center px-4 pt-16">
-        <div className="w-full max-w-[360px] rounded-lg shadow-md border border-neutral-200 overflow-hidden">
-          {/* カードデザインを背景に適用 */}
-          {cardSrc ? (
-            <div className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cardSrc} alt="カードデザイン" className="w-full h-32 object-cover" />
-              <div className="absolute inset-0 bg-black/10" />
-              <div className="absolute inset-0 p-4 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    {mounted && photo ? (
-                      <img src={photo} alt="" className="h-10 w-10 rounded-md object-cover" />
-                    ) : (
-                      <div className="h-10 w-10 rounded-md bg-white/80" />
-                    )}
-                    <div className="font-semibold text-[13px] text-white drop-shadow-lg" suppressHydrationWarning>
-                      {recipient || "山田さん"}
-                    </div>
-                  </div>
-                  <div className="text-[12px] leading-snug text-white drop-shadow-lg whitespace-pre-wrap" suppressHydrationWarning>
-                    {headline || "今まで本当にありがとうございました！"}
-                  </div>
-                </div>
-              </div>
+        <div className="w-full max-w-[360px] text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            {mounted && photo ? (
+              <img src={photo} alt="" className="h-10 w-10 rounded-md object-cover" />
+            ) : (
+              <div className="h-10 w-10 rounded-md bg-neutral-200" />
+            )}
+            <div className="font-semibold text-[13px] text-black" suppressHydrationWarning>
+              {recipient || "山田さん"}
             </div>
-          ) : (
-            <div className="bg-white/95 p-4">
-              <div className="flex items-center gap-3 mb-3">
-                {mounted && photo ? (
-                  <img src={photo} alt="" className="h-10 w-10 rounded-md object-cover" />
-                ) : (
-                  <div className="h-10 w-10 rounded-md bg-neutral-200" />
-                )}
-                <div className="font-semibold text-[13px]" suppressHydrationWarning>
-                  {recipient || "山田さん"}
-                </div>
-              </div>
-              <div className="text-[12px] leading-snug text-neutral-700 whitespace-pre-wrap" suppressHydrationWarning>
-                {headline || "今まで本当にありがとうございました！"}
-              </div>
-            </div>
-          )}
+          </div>
+          <div className="text-[12px] leading-snug text-black whitespace-pre-wrap" suppressHydrationWarning>
+            {headline || "今まで本当にありがとうございました！"}
+          </div>
         </div>
       </div>
     </div>

@@ -65,7 +65,7 @@ export default function CardPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {cards.map((c: any) => (
-            <Card key={c.id} className="p-4 text-center">
+            <Card key={c.id} className="p-4 text-center shadow-md">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={c.src} alt="カード" className="h-24 w-full object-contain rounded-xl border border-neutral-200 mb-3" />
               <div className="font-medium text-neutral-800 mb-2">{c.id}</div>
