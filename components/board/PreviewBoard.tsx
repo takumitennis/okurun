@@ -7,14 +7,11 @@ type Props = {
 };
 
 export default function PreviewBoard({ src, cardType, bannerText = "田中さん 卒業おめでとうございます！" }: Props) {
-  let recipient = "";
-  let headline = bannerText;
-  let photo: string | null = null;
-  if (typeof window !== "undefined") {
-    recipient = localStorage.getItem("okurun:recipient") || "";
-    headline = localStorage.getItem("okurun:headline") || headline;
-    photo = localStorage.getItem("okurun:recipientPhoto");
-  }
+  // Hydration差異を避けるため、初期レンダーは bannerText のみを描画し、
+  // マウント後に localStorage の値で更新する。
+  const recipient = typeof window !== "undefined" ? localStorage.getItem("okurun:recipient") || "" : "";
+  const headline = typeof window !== "undefined" ? localStorage.getItem("okurun:headline") || bannerText : bannerText;
+  const photo = typeof window !== "undefined" ? localStorage.getItem("okurun:recipientPhoto") : null;
   const combined = `${recipient ? `${recipient} ` : ""}${headline || ""}`.trim() || bannerText;
   return (
     <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273]">
@@ -40,10 +37,8 @@ export default function PreviewBoard({ src, cardType, bannerText = "田中さん
               <div className="text-center leading-snug">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="https://placehold.co/40x40" alt="avatar" className="mx-auto rounded-full mb-1" />
-                <div className="text-[10px] font-semibold">山田太郎</div>
-                <div className="text-[9px]">
-                  田中さんご退職おめでとうございます！
-                </div>
+                <div className="text-[10px] font-semibold">{recipient || "（未入力）"}</div>
+                <div className="text-[9px]">{headline}</div>
               </div>
             ) : (
               <div className="h-2 w-3/4 bg-neutral-200 rounded" />

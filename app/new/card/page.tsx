@@ -7,15 +7,15 @@ import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
 import PreviewBoard from "../../../components/board/PreviewBoard";
 
-// カードも画像ベースで追加していけるように、/public/designs/cards を読み込む
-// @ts-expect-error
-const serverCards = typeof window === "undefined" ? [] : (window as any).__cardDesigns || [];
+// APIから取得したカード一覧をクライアント側でキャッシュ
+let cachedCards: any[] = [];
 
 export default function CardPage() {
   const router = useRouter();
   const [designId, setDesignId] = useState<string | null>(null);
   const [designSrc, setDesignSrc] = useState<string | null>(null);
   const [cardType, setCardType] = useState<string | null>(null);
+  const [cards, setCards] = useState<any[]>(cachedCards);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -23,6 +23,21 @@ export default function CardPage() {
       setDesignSrc(localStorage.getItem("okurun:designSrc"));
       const saved = localStorage.getItem("okurun:cardType");
       if (saved) setCardType(saved);
+    }
+    // カード一覧をロード
+    if (cards.length === 0) {
+      (async () => {
+        try {
+          const res = await fetch("/api/designs", { cache: "no-store" });
+          const json = await res.json();
+          if (Array.isArray(json.cards)) {
+            cachedCards = json.cards;
+            setCards(json.cards);
+          }
+        } catch (e) {
+          console.error("failed to load cards", e);
+        }
+      })();
     }
   }, []);
 
@@ -49,13 +64,13 @@ export default function CardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {serverCards.map((c: any) => (
+          {cards.map((c: any) => (
             <Card key={c.id} className="p-4 text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={c.src} alt="カード" className="h-24 w-full object-contain rounded-xl border border-neutral-200 mb-3" />
               <div className="font-medium text-neutral-800 mb-2">{c.id}</div>
               <div className="flex justify-center gap-2">
-                <Button variant="outline" className="h-9 px-3">試す</Button>
+                <Button variant="outline" className="h-9 px-3" onClick={() => chooseCard(c.id)}>試す</Button>
                 <Button className="h-9 px-3" onClick={() => chooseCard(c.id)}>これにする</Button>
               </div>
             </Card>
