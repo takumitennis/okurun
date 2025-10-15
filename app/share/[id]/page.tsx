@@ -90,8 +90,13 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         scrollHeight: target.scrollHeight
       });
       
+      // 色紙サイズに合わせてスケール計算（242mm × 273mm = 914px × 1032px @ 96dpi）
+      const targetWidth = 914; // 242mm in pixels at 96dpi
+      const targetHeight = 1032; // 273mm in pixels at 96dpi
+      const scale = Math.min(targetWidth / target.offsetWidth, targetHeight / target.offsetHeight, 3); // 最大3倍まで
+      
       const canvas = await html2canvas(target, {
-        scale: 2,
+        scale: scale,
         useCORS: true,
         backgroundColor: "#ffffff",
         logging: false,
@@ -103,7 +108,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         height: target.offsetHeight,
         scrollX: 0,
         scrollY: 0,
-        ignoreElements: (element) => {
+        ignoreElements: (element: Element) => {
           // oklabカラー関数を使っている要素をスキップ
           const computedStyle = window.getComputedStyle(element);
           const color = computedStyle.color;
@@ -113,7 +118,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
           }
           return false;
         },
-        onclone: (clonedDoc) => {
+        onclone: (clonedDoc: Document) => {
           console.log("Cloned document:", clonedDoc);
           const clonedTarget = clonedDoc.getElementById("yosegaki-preview");
           if (clonedTarget) {
@@ -148,9 +153,19 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
 
       console.log("PDFを作成中...");
       const imgData = canvas.toDataURL("image/png", 1.0);
-      const orientation = canvas.width > canvas.height ? "l" : "p";
-      const pdf = new jsPDF({ orientation, unit: "px", format: [canvas.width, canvas.height] });
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height, undefined, "FAST");
+      
+      // 色紙サイズ（24.2cm × 27.3cm）でPDFを作成
+      const shikishiWidth = 242; // mm
+      const shikishiHeight = 273; // mm
+      
+      const pdf = new jsPDF({ 
+        orientation: "portrait", 
+        unit: "mm", 
+        format: [shikishiWidth, shikishiHeight] 
+      });
+      
+      // キャンバスを色紙サイズに合わせて配置（余白なし）
+      pdf.addImage(imgData, "PNG", 0, 0, shikishiWidth, shikishiHeight, undefined, "FAST");
       
       console.log("PDFを保存中...");
       pdf.save(`okurun_${id}.pdf`);

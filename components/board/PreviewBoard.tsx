@@ -135,7 +135,18 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
   const layout = getCardLayout(Math.min(totalMessageCount, 20));
   
   return (
-    <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273] bg-white" style={{ minHeight: '273px' }}>
+    <div 
+      id="yosegaki-preview"
+      className="relative mx-auto bg-white" 
+      style={{ 
+        width: '242mm', 
+        height: '273mm', 
+        minWidth: '242mm',
+        minHeight: '273mm',
+        maxWidth: '100vw', // 画面幅を超えないように
+        maxHeight: '100vh' // 画面高さを超えないように
+      }}
+    >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img 
