@@ -6,7 +6,7 @@ import FeatureSection from "../components/feature/FeatureSection";
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="mx-auto px-2 sm:px-4 py-8">
       {/* Hero */}
       <Hero />
 

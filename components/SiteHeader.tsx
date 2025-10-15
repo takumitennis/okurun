@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import Button from "./ui/Button";
+import LoginButton from "./auth/LoginButton";
 
 const navItems = [
   { href: "/new/paper", label: "作成する" },
@@ -43,9 +44,9 @@ export default function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Link href="/auth" className="ml-2">
-            <Button variant="primary">新規登録/ログイン</Button>
-          </Link>
+          <div className="ml-2">
+            <LoginButton />
+          </div>
         </nav>
       </div>
 
@@ -62,15 +63,9 @@ export default function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/auth"
-              onClick={() => setOpen(false)}
-              className="mt-2"
-            >
-              <div className="px-3 py-2 rounded-xl bg-brand text-white text-sm text-center hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand">
-                新規登録/ログイン
-              </div>
-            </Link>
+            <div className="mt-2" onClick={() => setOpen(false)}>
+              <LoginButton />
+            </div>
           </div>
         </div>
       )}

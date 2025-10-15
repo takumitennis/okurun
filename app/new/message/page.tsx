@@ -7,9 +7,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function NewMessagePage() {
-  const [recipient, setRecipient] = useState<string>(typeof window !== "undefined" ? localStorage.getItem("okurun:recipient") || "" : "");
-  const [headline, setHeadline] = useState<string>(typeof window !== "undefined" ? localStorage.getItem("okurun:headline") || "" : "");
-  const [photo, setPhoto] = useState<string | null>(typeof window !== "undefined" ? localStorage.getItem("okurun:recipientPhoto") : null);
+  // 初期値は空で描画し、マウント後に localStorage から同期（Hydration差異を回避）
+  const [recipient, setRecipient] = useState<string>("");
+  const [headline, setHeadline] = useState<string>("");
+  const [photo, setPhoto] = useState<string | null>(null);
   const router = useRouter();
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +29,19 @@ export default function NewMessagePage() {
     }
     router.push("/new/card");
   };
+
+  // マウント後に localStorage を同期
+  if (typeof window !== "undefined") {
+    // 同期は一度だけでよい
+    if (recipient === "" && headline === "" && photo === null) {
+      const r = localStorage.getItem("okurun:recipient") || "";
+      const h = localStorage.getItem("okurun:headline") || "";
+      const p = localStorage.getItem("okurun:recipientPhoto");
+      if (r !== recipient) setRecipient(r);
+      if (h !== headline) setHeadline(h);
+      if (p && p !== photo) setPhoto(p);
+    }
+  }
 
   return (
     <div>

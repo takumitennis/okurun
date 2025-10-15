@@ -29,14 +29,14 @@ function FeatureItem({ feature, reverse }: { feature: Feature; reverse?: boolean
 export default function FeatureSection() {
   const items: Feature[] = [
     {
-      src: "/features/free.svg",
+      src: "/features/free.png",
       alt: "無料で使える",
       title: "全て無料で使える",
       text:
         "デザインを選んでメッセージを集めるだけ。OKURUNは完全無料で寄せ書きを作成できます。他のサービスでは有料のPDFダウンロードも無料。写真付きでの出力も可能です。",
     },
     {
-      src: "/features/easy.svg",
+      src: "/features/easy.png",
       alt: "簡単操作",
       title: "直感的で簡単な操作",
       text: "スマホでもパソコンでもOK。シンプルなUIで誰でもすぐに寄せ書きを作れます。",
