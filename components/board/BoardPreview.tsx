@@ -17,6 +17,13 @@ type Props = {
   recipientPhoto?: string | null;
 };
 
+// 固定カードサイズ
+const CARD_WIDTH = 120;
+const CARD_HEIGHT = 100;
+const FONT_SIZE_NAME = 12;
+const FONT_SIZE_MESSAGE = 10;
+const AVATAR_SIZE = 24;
+
 // 列数を決定する関数
 const pickCols = (count: number): number => {
   if (count <= 1) return 1;
@@ -33,25 +40,18 @@ const pickGap = (count: number): number => {
   return 12;
 };
 
-// デコスタンプの配置を生成
+// デコスタンプの配置を生成（固定でHydrationエラーを回避）
 const generateDecorations = (count: number) => {
   if (count > 3) return [];
   
-  const decorations = [];
-  const numDecorations = Math.floor(Math.random() * 3) + 2; // 2-4個
+  // 固定の配置でHydrationエラーを回避
+  const fixedDecorations = [
+    { id: 0, type: 'confetti', x: 20, y: 30, rotation: 15, scale: 1.0 },
+    { id: 1, type: 'stamp', x: 70, y: 60, rotation: -20, scale: 0.9 },
+    { id: 2, type: 'confetti', x: 40, y: 80, rotation: 45, scale: 1.1 },
+  ];
   
-  for (let i = 0; i < numDecorations; i++) {
-    decorations.push({
-      id: i,
-      type: Math.random() > 0.5 ? 'confetti' : 'stamp',
-      x: Math.random() * 80 + 10, // 10-90%
-      y: Math.random() * 80 + 10, // 10-90%
-      rotation: Math.random() * 360,
-      scale: 0.8 + Math.random() * 0.4, // 0.8-1.2
-    });
-  }
-  
-  return decorations;
+  return fixedDecorations.slice(0, Math.min(count, 3));
 };
 
 export default function BoardPreview({ 
@@ -89,31 +89,9 @@ export default function BoardPreview({
   const totalCount = 1 + messages.length; // 受取人 + メッセージ数
   const cols = pickCols(totalCount);
   const gap = pickGap(totalCount);
-  const decorations = generateDecorations(totalCount);
+  const decorations = mounted ? generateDecorations(totalCount) : []; // Hydrationエラー回避
   
   const combined = `${localRecipient} ${localHeadline}`.trim();
-
-  // カードのスタイルを決定
-  const getCardStyle = (index: number) => {
-    const isLargeCard = totalCount <= 2;
-    const cardClass = isLargeCard ? "card--xl" : "card";
-    
-    return {
-      className: cardClass,
-      style: {
-        width: isLargeCard ? "clamp(280px, 40vw, 520px)" : "clamp(160px, calc(100% - var(--gap)), 280px)",
-        aspectRatio: "3/2",
-        borderRadius: "16px",
-        boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
-        background: localCardSrc ? `url(${localCardSrc})` : "#ffffff",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        position: "relative" as const,
-        overflow: "hidden" as const,
-        border: "1px solid rgba(255, 255, 255, 0.8)"
-      }
-    };
-  };
 
   return (
     <section 
@@ -125,11 +103,8 @@ export default function BoardPreview({
         minWidth: "320px",
         minHeight: "360px",
         maxWidth: "90vw",
-        maxHeight: "80vh",
-        "--cols": cols,
-        "--gap": `${gap}px`,
-        "--gap-px": gap
-      } as React.CSSProperties}
+        maxHeight: "80vh"
+      }}
     >
       {/* 背景画像 */}
       {localDesignSrc ? (
@@ -167,7 +142,7 @@ export default function BoardPreview({
         style={{ 
           paddingTop: '70px',
           display: 'grid',
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gridTemplateColumns: `repeat(${cols}, ${CARD_WIDTH}px)`,
           gap: `${gap}px`,
           placeContent: totalCount <= 2 ? 'center' : 'start',
           alignContent: 'center',
@@ -175,89 +150,111 @@ export default function BoardPreview({
         }}
       >
         {/* 受取人カード（最初のカード） */}
-        <div {...getCardStyle(0)}>
+        <div 
+          className="relative rounded-2xl shadow-lg flex flex-col items-center justify-center p-3 text-neutral-800 overflow-hidden"
+          style={{
+            width: `${CARD_WIDTH}px`,
+            height: `${CARD_HEIGHT}px`,
+            backgroundColor: localCardSrc ? 'transparent' : '#ffffff',
+            backgroundImage: localCardSrc ? `url(${localCardSrc})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
           {/* カードデザインがある場合は薄いオーバーレイ */}
           {localCardSrc && <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }} />}
           
-          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4">
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
             {mounted && localPhoto ? (
-              <img src={localPhoto} alt="" className="rounded-full object-cover mb-3" style={{ 
-                height: totalCount <= 2 ? '48px' : '32px', 
-                width: totalCount <= 2 ? '48px' : '32px' 
+              <img src={localPhoto} alt="" className="rounded-full object-cover mb-2" style={{ 
+                height: `${AVATAR_SIZE}px`, 
+                width: `${AVATAR_SIZE}px` 
               }} />
             ) : (
-              <div className="rounded-full mb-3" style={{ 
-                height: totalCount <= 2 ? '48px' : '32px', 
-                width: totalCount <= 2 ? '48px' : '32px', 
+              <div className="rounded-full mb-2" style={{ 
+                height: `${AVATAR_SIZE}px`, 
+                width: `${AVATAR_SIZE}px`, 
                 backgroundColor: '#d1d5db' 
               }} />
             )}
-            <h3 className="font-semibold text-center mb-2 px-2" style={{ 
+            <div className="font-semibold text-center mb-1 px-1" style={{ 
               color: '#000000', 
               lineHeight: '1.3', 
               wordBreak: 'break-all',
-              fontSize: totalCount <= 2 ? 'clamp(16px, 2vw, 24px)' : 'clamp(14px, 1.4vw, 18px)'
+              fontSize: `${FONT_SIZE_NAME}px`
             }}>
               {localRecipient}
-            </h3>
-            <p className="text-center px-2" style={{ 
+            </div>
+            <div className="text-center px-1" style={{ 
               color: '#000000', 
               lineHeight: '1.2', 
               wordBreak: 'break-all',
-              fontSize: totalCount <= 2 ? 'clamp(14px, 1.5vw, 20px)' : 'clamp(12px, 1.2vw, 16px)'
+              fontSize: `${FONT_SIZE_MESSAGE}px`
             }}>
               {localHeadline}
-            </p>
+            </div>
           </div>
         </div>
 
         {/* メッセージカード */}
-        {messages.map((message, index) => {
-          const cardStyle = getCardStyle(index + 1);
-          return (
-            <div key={message.id} {...cardStyle}>
-              {/* カードデザインがある場合は薄いオーバーレイ */}
-              {localCardSrc && <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }} />}
-              
-              <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4">
-                {message.photo ? (
-                  <img src={message.photo} alt="" className="rounded-full object-cover mb-3" style={{ 
-                    height: totalCount <= 2 ? '48px' : '32px', 
-                    width: totalCount <= 2 ? '48px' : '32px' 
+        {messages.map((message, index) => (
+          <div 
+            key={message.id}
+            className="relative rounded-2xl shadow-lg flex flex-col items-center justify-center p-3 text-neutral-800 overflow-hidden"
+            style={{
+              width: `${CARD_WIDTH}px`,
+              height: `${CARD_HEIGHT}px`,
+              backgroundColor: localCardSrc ? 'transparent' : '#ffffff',
+              backgroundImage: localCardSrc ? `url(${localCardSrc})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              border: '1px solid rgba(255, 255, 255, 0.8)',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            {/* カードデザインがある場合は薄いオーバーレイ */}
+            {localCardSrc && <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }} />}
+            
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
+              {message.photo ? (
+                <img src={message.photo} alt="" className="rounded-full object-cover mb-2" style={{ 
+                  height: `${AVATAR_SIZE}px`, 
+                  width: `${AVATAR_SIZE}px` 
+                }} />
+              ) : (
+                <div className="rounded-full mb-2 flex items-center justify-center" style={{ 
+                  height: `${AVATAR_SIZE}px`, 
+                  width: `${AVATAR_SIZE}px`, 
+                  backgroundColor: 'rgba(255,107,107,0.2)' 
+                }}>
+                  <div className="rounded-full" style={{ 
+                    height: `${AVATAR_SIZE / 2}px`, 
+                    width: `${AVATAR_SIZE / 2}px`, 
+                    backgroundColor: '#FF6B6B' 
                   }} />
-                ) : (
-                  <div className="rounded-full mb-3 flex items-center justify-center" style={{ 
-                    height: totalCount <= 2 ? '48px' : '32px', 
-                    width: totalCount <= 2 ? '48px' : '32px', 
-                    backgroundColor: 'rgba(255,107,107,0.2)' 
-                  }}>
-                    <div className="rounded-full" style={{ 
-                      height: totalCount <= 2 ? '24px' : '16px', 
-                      width: totalCount <= 2 ? '24px' : '16px', 
-                      backgroundColor: '#FF6B6B' 
-                    }} />
-                  </div>
-                )}
-                <h3 className="font-semibold text-center mb-2 px-2" style={{ 
-                  color: '#000000', 
-                  lineHeight: '1.3', 
-                  wordBreak: 'break-all',
-                  fontSize: totalCount <= 2 ? 'clamp(16px, 2vw, 24px)' : 'clamp(14px, 1.4vw, 18px)'
-                }}>
-                  {message.name}
-                </h3>
-                <p className="text-center px-2" style={{ 
-                  color: '#000000', 
-                  lineHeight: '1.2', 
-                  wordBreak: 'break-all',
-                  fontSize: totalCount <= 2 ? 'clamp(14px, 1.5vw, 20px)' : 'clamp(12px, 1.2vw, 16px)'
-                }}>
-                  {message.message}
-                </p>
+                </div>
+              )}
+              <div className="font-semibold text-center mb-1 px-1" style={{ 
+                color: '#000000', 
+                lineHeight: '1.3', 
+                wordBreak: 'break-all',
+                fontSize: `${FONT_SIZE_NAME}px`
+              }}>
+                {message.name}
+              </div>
+              <div className="text-center px-1" style={{ 
+                color: '#000000', 
+                lineHeight: '1.2', 
+                wordBreak: 'break-all',
+                fontSize: `${FONT_SIZE_MESSAGE}px`
+              }}>
+                {message.message}
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* デコスタンプ（3枚以下の場合のみ） */}
