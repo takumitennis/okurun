@@ -19,9 +19,21 @@ export default function LoginButton() {
   if (session) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm text-neutral-700">
-          {session.user?.name || session.user?.email}
-        </span>
+        <button
+          onClick={() => router.push("/me")}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors"
+        >
+          {session.user?.image && (
+            <img
+              src={session.user.image}
+              alt="プロフィール"
+              className="h-6 w-6 rounded-full"
+            />
+          )}
+          <span className="text-sm text-neutral-700">
+            {session.user?.name || session.user?.email}
+          </span>
+        </button>
         <Button 
           onClick={() => signOut()}
           variant="outline"
