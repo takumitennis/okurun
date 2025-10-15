@@ -65,46 +65,64 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
 
       {/* メッセージカード群（20カード分のグリッド） */}
       <div className="absolute inset-0 grid grid-cols-4 grid-rows-5 gap-2 p-4 pt-16">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div key={i} className="bg-white/95 rounded-md shadow-sm border border-neutral-200 p-2 flex flex-col items-center justify-center text-center">
-            {i === 0 ? (
-              // 最初のカードは受取人情報
-              <>
-                {mounted && photo ? (
-                  <img src={photo} alt="" className="h-6 w-6 rounded-full object-cover mb-1" />
+        {Array.from({ length: 20 }).map((_, i) => {
+          // カードデザインを背景に適用
+          const cardStyle = cardSrc ? {
+            backgroundImage: `url(${cardSrc})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          } : {};
+          
+          return (
+            <div 
+              key={i} 
+              className="rounded-md shadow-sm border border-neutral-200 p-2 flex flex-col items-center justify-center text-center relative overflow-hidden"
+              style={cardStyle}
+            >
+              {/* カードデザインがある場合は薄いオーバーレイを追加 */}
+              {cardSrc && <div className="absolute inset-0 bg-white/80" />}
+              
+              <div className="relative z-10">
+                {i === 0 ? (
+                  // 最初のカードは受取人情報
+                  <>
+                    {mounted && photo ? (
+                      <img src={photo} alt="" className="h-6 w-6 rounded-full object-cover mb-1" />
+                    ) : (
+                      <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
+                    )}
+                    <div className="text-[9px] font-semibold text-black leading-tight" suppressHydrationWarning>
+                      {recipient || "山田さん"}
+                    </div>
+                    <div className="text-[8px] text-black leading-tight" suppressHydrationWarning>
+                      {headline || "今まで本当にありがとうございました！"}
+                    </div>
+                  </>
+                ) : i === 1 ? (
+                  // 2番目のカードはサンプルメッセージ
+                  <>
+                    <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
+                      <div className="h-3 w-3 rounded-full bg-accent" />
+                    </div>
+                    <div className="text-[9px] font-semibold text-black leading-tight">
+                      田中さん
+                    </div>
+                    <div className="text-[8px] text-black leading-tight">
+                      お疲れ様でした！
+                    </div>
+                  </>
                 ) : (
-                  <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
+                  // その他のカードは空のプレースホルダー
+                  <>
+                    <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
+                    <div className="h-2 w-full bg-neutral-200 rounded mb-1" />
+                    <div className="h-1.5 w-3/4 bg-neutral-200 rounded" />
+                  </>
                 )}
-                <div className="text-[9px] font-semibold text-black leading-tight" suppressHydrationWarning>
-                  {recipient || "山田さん"}
-                </div>
-                <div className="text-[8px] text-black leading-tight" suppressHydrationWarning>
-                  {headline || "今まで本当にありがとうございました！"}
-                </div>
-              </>
-            ) : i === 1 ? (
-              // 2番目のカードはサンプルメッセージ
-              <>
-                <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
-                  <div className="h-3 w-3 rounded-full bg-accent" />
-                </div>
-                <div className="text-[9px] font-semibold text-black leading-tight">
-                  田中さん
-                </div>
-                <div className="text-[8px] text-black leading-tight">
-                  お疲れ様でした！
-                </div>
-              </>
-            ) : (
-              // その他のカードは空のプレースホルダー
-              <>
-                <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
-                <div className="h-2 w-full bg-neutral-200 rounded mb-1" />
-                <div className="h-1.5 w-3/4 bg-neutral-200 rounded" />
-              </>
-            )}
-          </div>
-        ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
