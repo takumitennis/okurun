@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="無料で使える">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2d87ff"/>
+      <stop offset="100%" stop-color="#1a6edb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <g fill="#fff" font-family="'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" font-weight="700" text-anchor="middle">
+    <text x="600" y="360" font-size="200">無 料</text>
+    <text x="600" y="520" font-size="48">OKURUN は無料で使えます</text>
+  </g>
+</svg>
+
+

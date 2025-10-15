@@ -29,14 +29,14 @@ function FeatureItem({ feature, reverse }: { feature: Feature; reverse?: boolean
 export default function FeatureSection() {
   const items: Feature[] = [
     {
-      src: "https://images.unsplash.com/photo-1523246191818-8bfa6a79a8ae?q=80&w=1200&auto=format&fit=crop",
+      src: "/features/free.svg",
       alt: "無料で使える",
       title: "全て無料で使える",
       text:
         "デザインを選んでメッセージを集めるだけ。OKURUNは完全無料で寄せ書きを作成できます。他のサービスでは有料のPDFダウンロードも無料。写真付きでの出力も可能です。",
     },
     {
-      src: "https://images.unsplash.com/photo-1551793165-83ef9b1646f9?q=80&w=1200&auto=format&fit=crop",
+      src: "/features/easy.svg",
       alt: "簡単操作",
       title: "直感的で簡単な操作",
       text: "スマホでもパソコンでもOK。シンプルなUIで誰でもすぐに寄せ書きを作れます。",
