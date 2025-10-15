@@ -127,7 +127,7 @@ export default function BoardPreview({
         ) : (
           <div className="h-8 w-8 rounded-full" style={{ backgroundColor: '#d1d5db' }} />
         )}
-        <div className="text-[12px] font-semibold leading-tight text-center" style={{ 
+        <div className="text-[18px] font-semibold leading-tight text-center" style={{ 
           color: '#000000', 
           lineHeight: '1.4',
           textShadow: '1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(255,255,255,0.8), 1px -1px 2px rgba(255,255,255,0.8), -1px 1px 2px rgba(255,255,255,0.8)'
