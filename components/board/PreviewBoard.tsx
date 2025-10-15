@@ -88,17 +88,14 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
       )}
 
       {/* 上部バナー（送り先の写真＋一言） */}
-      <div className="absolute left-3 right-3 top-3 px-4 py-3 flex items-center justify-center gap-2 rounded-lg" style={{ 
-        paddingTop: '12px', 
-        paddingBottom: '12px',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(4px)',
-        border: '1px solid rgba(255, 255, 255, 0.8)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-      }}>
+      <div className="absolute left-3 right-3 top-4 px-3 py-2 flex items-center justify-center gap-2" style={{ paddingTop: '16px' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full" style={{ backgroundColor: '#d1d5db' }} />}
-        <div className="text-[12px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.4' }}>
+        <div className="text-[12px] font-semibold leading-tight text-center" style={{ 
+          color: '#000000', 
+          lineHeight: '1.4',
+          textShadow: '1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(255,255,255,0.8), 1px -1px 2px rgba(255,255,255,0.8), -1px 1px 2px rgba(255,255,255,0.8)'
+        }}>
           {combined}
         </div>
       </div>
