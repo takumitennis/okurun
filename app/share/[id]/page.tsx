@@ -94,21 +94,35 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
-        logging: true,
+        logging: false,
         allowTaint: true,
-        foreignObjectRendering: true,
+        foreignObjectRendering: false,
         imageTimeout: 15000,
         removeContainer: false,
         width: target.offsetWidth,
         height: target.offsetHeight,
         scrollX: 0,
         scrollY: 0,
+        ignoreElements: (element) => {
+          // oklabカラー関数を使っている要素をスキップ
+          const computedStyle = window.getComputedStyle(element);
+          const color = computedStyle.color;
+          if (color && color.includes('oklab')) {
+            console.log("Skipping element with oklab color:", element, color);
+            return true;
+          }
+          return false;
+        },
         onclone: (clonedDoc) => {
           console.log("Cloned document:", clonedDoc);
           const clonedTarget = clonedDoc.getElementById("yosegaki-preview");
           if (clonedTarget) {
             console.log("Cloned target found:", clonedTarget);
-            console.log("Cloned target styles:", window.getComputedStyle(clonedTarget));
+            // oklabカラー関数を通常のカラーに置換
+            const style = clonedTarget.style;
+            if (style.color && style.color.includes('oklab')) {
+              style.color = '#000000';
+            }
           } else {
             console.error("Cloned target not found!");
           }
@@ -129,13 +143,6 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         
         if (!hasContent) {
           console.warn("Canvas appears to be blank!");
-          // デバッグ用にキャンバスをページに表示
-          canvas.style.border = "2px solid red";
-          canvas.style.position = "fixed";
-          canvas.style.top = "10px";
-          canvas.style.left = "10px";
-          canvas.style.zIndex = "9999";
-          document.body.appendChild(canvas);
         }
       }
 

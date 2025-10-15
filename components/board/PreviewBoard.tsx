@@ -73,7 +73,7 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
       <div className="absolute left-3 right-3 top-3 px-3 py-2 flex items-center justify-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full bg-neutral-300" />}
-        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis text-black">
+        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#000000' }}>
           {combined}
         </div>
       </div>
@@ -106,10 +106,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                     ) : (
                       <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
                     )}
-                    <div className="text-[9px] font-semibold text-black leading-tight">
+                    <div className="text-[9px] font-semibold leading-tight" style={{ color: '#000000' }}>
                       {recipient}
                     </div>
-                    <div className="text-[8px] text-black leading-tight">
+                    <div className="text-[8px] leading-tight" style={{ color: '#000000' }}>
                       {headline}
                     </div>
                   </>
@@ -123,10 +123,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                         <div className="h-3 w-3 rounded-full bg-accent" />
                       </div>
                     )}
-                    <div className="text-[9px] font-semibold text-black leading-tight">
+                    <div className="text-[9px] font-semibold leading-tight" style={{ color: '#000000' }}>
                       {messages[i - 1].name}
                     </div>
-                    <div className="text-[8px] text-black leading-tight">
+                    <div className="text-[8px] leading-tight" style={{ color: '#000000' }}>
                       {messages[i - 1].message}
                     </div>
                   </>
@@ -136,10 +136,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                     <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
                       <div className="h-3 w-3 rounded-full bg-accent" />
                     </div>
-                    <div className="text-[9px] font-semibold text-black leading-tight">
+                    <div className="text-[9px] font-semibold leading-tight" style={{ color: '#000000' }}>
                       田中さん
                     </div>
-                    <div className="text-[8px] text-black leading-tight">
+                    <div className="text-[8px] leading-tight" style={{ color: '#000000' }}>
                       お疲れ様でした！
                     </div>
                   </>
