@@ -59,9 +59,40 @@ export default function CardPage() {
   };
 
   const next = async () => {
-    // 擬似insert（実運用時は Supabase クライアントに置換）
-    const randomId = Math.random().toString(36).slice(2, 10);
-    router.push(`/share/${randomId}`);
+    try {
+      // ローカル環境ではAPI経由でボードを作成
+      const boardData = {
+        designId: localStorage.getItem("okurun:designId"),
+        designSrc: localStorage.getItem("okurun:designSrc"),
+        cardType: localStorage.getItem("okurun:cardType"),
+        recipient: localStorage.getItem("okurun:recipient"),
+        headline: localStorage.getItem("okurun:headline"),
+        recipientPhoto: localStorage.getItem("okurun:recipientPhoto"),
+      };
+
+      const response = await fetch("/api/boards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(boardData),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log("ボード作成成功:", result);
+        router.push(`/share/${result.id}`);
+      } else {
+        console.error("ボード作成失敗:", result.error);
+        // フォールバック: ローカルIDで遷移
+        const randomId = Math.random().toString(36).slice(2, 10);
+        router.push(`/share/${randomId}`);
+      }
+    } catch (error) {
+      console.error("API呼び出しエラー:", error);
+      // フォールバック: ローカルIDで遷移
+      const randomId = Math.random().toString(36).slice(2, 10);
+      router.push(`/share/${randomId}`);
+    }
   };
 
   return (

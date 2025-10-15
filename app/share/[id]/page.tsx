@@ -9,10 +9,17 @@ import PreviewBoard from "../../../components/board/PreviewBoard";
 
 export default function SharePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const url = `https://okurun.jp/b/${id}`;
   const [designSrc, setDesignSrc] = useState<string | undefined>(undefined);
   const [cardType, setCardType] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [url, setUrl] = useState<string>("");
+
+  useEffect(() => {
+    // クライアントサイドで環境を判定
+    const isLocal = window.location.hostname === "localhost";
+    const baseUrl = isLocal ? "http://localhost:3000" : "https://okurun.dev";
+    setUrl(`${baseUrl}/b/${id}`);
+  }, [id]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

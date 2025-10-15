@@ -31,12 +31,39 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
 
   const overLimit = message.length > MESSAGE_MAX;
 
-  const submit = () => {
+  const submit = async () => {
     if (overLimit || !name || !message) return;
-    // 本来はAPI保存。ここではサンクス表示のみ
-    setSubmitted(true);
-    setName("");
-    setMessage("");
+    
+    try {
+      const messageData = {
+        boardId: id,
+        name,
+        message,
+        photo,
+      };
+
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messageData),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log("メッセージ投稿成功:", result);
+        setSubmitted(true);
+        setName("");
+        setMessage("");
+        setPhoto(null);
+      } else {
+        console.error("メッセージ投稿失敗:", result.error);
+        alert("メッセージの投稿に失敗しました。再度お試しください。");
+      }
+    } catch (error) {
+      console.error("API呼び出しエラー:", error);
+      alert("エラーが発生しました。再度お試しください。");
+    }
   };
 
   return (
@@ -80,7 +107,17 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
               </div>
               <div>
                 <label className="block text-sm text-neutral-700 mb-1">写真（任意）</label>
-                <input type="file" accept="image/*" onChange={onFile} />
+                <div className="space-y-2">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={onFile}
+                    className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-brand file:text-white hover:file:bg-brand-dark"
+                  />
+                  {photo && (
+                    <div className="text-xs text-green-600">✓ 写真が選択されました</div>
+                  )}
+                </div>
               </div>
               <Button type="submit" className="px-6 py-2" disabled={overLimit || !name || !message}>
                 完了する
