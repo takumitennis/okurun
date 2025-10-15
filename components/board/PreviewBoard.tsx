@@ -57,16 +57,79 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
   // 実際のメッセージ数を計算（受取人情報 + 投稿メッセージ数）
   const totalMessageCount = 1 + (messages?.length || 0);
   
-  // カード配置の計算
+  // カード配置の計算（メッセージ数に応じてサイズも調整）
   const getCardLayout = (count: number) => {
-    if (count <= 2) return { rows: 2, cols: 2, itemsPerRow: [count, 0] };
-    if (count <= 4) return { rows: 2, cols: 3, itemsPerRow: [2, Math.max(0, count - 2)] };
-    if (count <= 6) return { rows: 3, cols: 3, itemsPerRow: [2, 2, Math.max(0, count - 4)] };
-    if (count <= 8) return { rows: 3, cols: 3, itemsPerRow: [3, 3, Math.max(0, count - 6)] };
-    if (count <= 12) return { rows: 3, cols: 4, itemsPerRow: [4, 4, Math.max(0, count - 8)] };
-    if (count <= 16) return { rows: 4, cols: 4, itemsPerRow: [4, 4, 4, Math.max(0, count - 12)] };
-    // 20個以上は通常の4x5グリッド
-    return { rows: 5, cols: 4, itemsPerRow: [4, 4, 4, 4, 4] };
+    if (count === 1) {
+      return { 
+        rows: 1, 
+        cols: 1, 
+        itemsPerRow: [1],
+        cardSize: { width: 120, height: 100 }, // 1個の時は大きく
+        gap: 0
+      };
+    }
+    if (count === 2) {
+      return { 
+        rows: 1, 
+        cols: 2, 
+        itemsPerRow: [2],
+        cardSize: { width: 90, height: 80 }, // 2個の時は中サイズ
+        gap: 8
+      };
+    }
+    if (count <= 4) {
+      return { 
+        rows: 2, 
+        cols: 2, 
+        itemsPerRow: [2, Math.max(0, count - 2)],
+        cardSize: { width: 80, height: 70 }, // 4個まで
+        gap: 6
+      };
+    }
+    if (count <= 6) {
+      return { 
+        rows: 2, 
+        cols: 3, 
+        itemsPerRow: [3, Math.max(0, count - 3)],
+        cardSize: { width: 70, height: 65 },
+        gap: 4
+      };
+    }
+    if (count <= 8) {
+      return { 
+        rows: 2, 
+        cols: 4, 
+        itemsPerRow: [4, Math.max(0, count - 4)],
+        cardSize: { width: 65, height: 60 },
+        gap: 3
+      };
+    }
+    if (count <= 12) {
+      return { 
+        rows: 3, 
+        cols: 4, 
+        itemsPerRow: [4, 4, Math.max(0, count - 8)],
+        cardSize: { width: 60, height: 55 },
+        gap: 2
+      };
+    }
+    if (count <= 16) {
+      return { 
+        rows: 4, 
+        cols: 4, 
+        itemsPerRow: [4, 4, 4, Math.max(0, count - 12)],
+        cardSize: { width: 58, height: 52 },
+        gap: 2
+      };
+    }
+    // 20個以上は通常の4x5グリッド（小さく）
+    return { 
+      rows: 5, 
+      cols: 4, 
+      itemsPerRow: [4, 4, 4, 4, 4],
+      cardSize: { width: 55, height: 50 },
+      gap: 1
+    };
   };
   
   const layout = getCardLayout(Math.min(totalMessageCount, 20));
@@ -102,13 +165,13 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
 
       {/* メッセージカード群（動的配置） */}
       <div className="absolute inset-0 p-4" style={{ paddingTop: '60px' }}>
-        <div className="h-full flex flex-col justify-center gap-2">
+        <div className="h-full flex flex-col justify-center" style={{ gap: `${layout.gap}px` }}>
           {Array.from({ length: layout.rows }).map((_, rowIndex) => {
             const itemsInRow = layout.itemsPerRow[rowIndex] || 0;
             if (itemsInRow === 0) return null;
             
             return (
-              <div key={rowIndex} className="flex justify-center gap-2">
+              <div key={rowIndex} className="flex justify-center" style={{ gap: `${layout.gap}px` }}>
                 {Array.from({ length: itemsInRow }).map((_, colIndex) => {
                   const globalIndex = layout.itemsPerRow.slice(0, rowIndex).reduce((sum, count) => sum + count, 0) + colIndex;
                   
@@ -126,10 +189,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                       className="rounded-md shadow-sm border p-2 flex flex-col items-center justify-center text-center relative overflow-hidden"
                       style={{ 
                         ...cardStyle, 
-                        width: '60px', 
-                        height: '70px',
-                        minWidth: '60px',
-                        minHeight: '70px'
+                        width: `${layout.cardSize.width}px`, 
+                        height: `${layout.cardSize.height}px`,
+                        minWidth: `${layout.cardSize.width}px`,
+                        minHeight: `${layout.cardSize.height}px`
                       }}
                     >
                       {/* カードデザインがある場合は薄いオーバーレイを追加 */}
@@ -140,14 +203,24 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                           // 最初のカードは受取人情報
                           <>
                             {mounted && photo ? (
-                              <img src={photo} alt="" className="h-5 w-5 rounded-full object-cover mb-1" />
+                              <img src={photo} alt="" className="rounded-full object-cover mb-1" style={{ height: `${Math.max(16, layout.cardSize.width * 0.15)}px`, width: `${Math.max(16, layout.cardSize.width * 0.15)}px` }} />
                             ) : (
-                              <div className="h-5 w-5 rounded-full mb-1" style={{ backgroundColor: '#e5e7eb' }} />
+                              <div className="rounded-full mb-1" style={{ height: `${Math.max(16, layout.cardSize.width * 0.15)}px`, width: `${Math.max(16, layout.cardSize.width * 0.15)}px`, backgroundColor: '#e5e7eb' }} />
                             )}
-                            <div className="text-[8px] font-semibold leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.3', wordBreak: 'break-all' }}>
+                            <div className="font-semibold leading-tight text-center px-1" style={{ 
+                              color: '#000000', 
+                              lineHeight: '1.3', 
+                              wordBreak: 'break-all',
+                              fontSize: `${Math.max(8, layout.cardSize.width * 0.08)}px`
+                            }}>
                               {recipient}
                             </div>
-                            <div className="text-[7px] leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.2', wordBreak: 'break-all' }}>
+                            <div className="leading-tight text-center px-1" style={{ 
+                              color: '#000000', 
+                              lineHeight: '1.2', 
+                              wordBreak: 'break-all',
+                              fontSize: `${Math.max(6, layout.cardSize.width * 0.07)}px`
+                            }}>
                               {headline}
                             </div>
                           </>
@@ -155,38 +228,58 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                           // 実際のメッセージデータがある場合
                           <>
                             {messages[globalIndex - 1].photo ? (
-                              <img src={messages[globalIndex - 1].photo} alt="" className="h-5 w-5 rounded-full object-cover mb-1" />
+                              <img src={messages[globalIndex - 1].photo} alt="" className="rounded-full object-cover mb-1" style={{ height: `${Math.max(16, layout.cardSize.width * 0.15)}px`, width: `${Math.max(16, layout.cardSize.width * 0.15)}px` }} />
                             ) : (
-                              <div className="h-5 w-5 rounded-full mb-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(255,107,107,0.2)' }}>
-                                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FF6B6B' }} />
+                              <div className="rounded-full mb-1 flex items-center justify-center" style={{ height: `${Math.max(16, layout.cardSize.width * 0.15)}px`, width: `${Math.max(16, layout.cardSize.width * 0.15)}px`, backgroundColor: 'rgba(255,107,107,0.2)' }}>
+                                <div className="rounded-full" style={{ height: `${Math.max(8, layout.cardSize.width * 0.08)}px`, width: `${Math.max(8, layout.cardSize.width * 0.08)}px`, backgroundColor: '#FF6B6B' }} />
                               </div>
                             )}
-                            <div className="text-[8px] font-semibold leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.3', wordBreak: 'break-all' }}>
+                            <div className="font-semibold leading-tight text-center px-1" style={{ 
+                              color: '#000000', 
+                              lineHeight: '1.3', 
+                              wordBreak: 'break-all',
+                              fontSize: `${Math.max(8, layout.cardSize.width * 0.08)}px`
+                            }}>
                               {messages[globalIndex - 1].name}
                             </div>
-                            <div className="text-[7px] leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.2', wordBreak: 'break-all' }}>
+                            <div className="leading-tight text-center px-1" style={{ 
+                              color: '#000000', 
+                              lineHeight: '1.2', 
+                              wordBreak: 'break-all',
+                              fontSize: `${Math.max(6, layout.cardSize.width * 0.07)}px`
+                            }}>
                               {messages[globalIndex - 1].message}
                             </div>
                           </>
                         ) : globalIndex === 1 ? (
                           // 2番目のカードはサンプルメッセージ（メッセージがない場合）
                           <>
-                            <div className="h-5 w-5 rounded-full mb-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(255,107,107,0.2)' }}>
-                              <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FF6B6B' }} />
+                            <div className="rounded-full mb-1 flex items-center justify-center" style={{ height: `${Math.max(16, layout.cardSize.width * 0.15)}px`, width: `${Math.max(16, layout.cardSize.width * 0.15)}px`, backgroundColor: 'rgba(255,107,107,0.2)' }}>
+                              <div className="rounded-full" style={{ height: `${Math.max(8, layout.cardSize.width * 0.08)}px`, width: `${Math.max(8, layout.cardSize.width * 0.08)}px`, backgroundColor: '#FF6B6B' }} />
                             </div>
-                            <div className="text-[8px] font-semibold leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.3', wordBreak: 'break-all' }}>
+                            <div className="font-semibold leading-tight text-center px-1" style={{ 
+                              color: '#000000', 
+                              lineHeight: '1.3', 
+                              wordBreak: 'break-all',
+                              fontSize: `${Math.max(8, layout.cardSize.width * 0.08)}px`
+                            }}>
                               田中さん
                             </div>
-                            <div className="text-[7px] leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.2', wordBreak: 'break-all' }}>
+                            <div className="leading-tight text-center px-1" style={{ 
+                              color: '#000000', 
+                              lineHeight: '1.2', 
+                              wordBreak: 'break-all',
+                              fontSize: `${Math.max(6, layout.cardSize.width * 0.07)}px`
+                            }}>
                               お疲れ様でした！
                             </div>
                           </>
                         ) : (
                           // その他のカードは空のプレースホルダー
                           <>
-                            <div className="h-5 w-5 rounded-full mb-1" style={{ backgroundColor: '#e5e7eb' }} />
-                            <div className="h-1.5 w-full rounded mb-1" style={{ backgroundColor: '#e5e7eb' }} />
-                            <div className="h-1 w-3/4 rounded" style={{ backgroundColor: '#e5e7eb' }} />
+                            <div className="rounded-full mb-1" style={{ height: `${Math.max(16, layout.cardSize.width * 0.15)}px`, width: `${Math.max(16, layout.cardSize.width * 0.15)}px`, backgroundColor: '#e5e7eb' }} />
+                            <div className="w-full rounded mb-1" style={{ height: `${Math.max(4, layout.cardSize.width * 0.03)}px`, backgroundColor: '#e5e7eb' }} />
+                            <div className="w-3/4 rounded" style={{ height: `${Math.max(3, layout.cardSize.width * 0.02)}px`, backgroundColor: '#e5e7eb' }} />
                           </>
                         )}
                       </div>
