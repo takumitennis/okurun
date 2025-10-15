@@ -139,12 +139,12 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
       id="yosegaki-preview"
       className="relative mx-auto bg-white" 
       style={{ 
-        width: '242mm', 
-        height: '273mm', 
-        minWidth: '242mm',
-        minHeight: '273mm',
-        maxWidth: '100vw', // 画面幅を超えないように
-        maxHeight: '100vh' // 画面高さを超えないように
+        width: 'min(242mm, 80vw)', 
+        height: 'min(273mm, 80vh)', 
+        minWidth: '320px',
+        minHeight: '360px',
+        maxWidth: '90vw', // 画面幅の90%を超えないように
+        maxHeight: '80vh' // 画面高さの80%を超えないように
       }}
     >
       {src ? (

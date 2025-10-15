@@ -93,7 +93,21 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       // 色紙サイズに合わせてスケール計算（242mm × 273mm = 914px × 1032px @ 96dpi）
       const targetWidth = 914; // 242mm in pixels at 96dpi
       const targetHeight = 1032; // 273mm in pixels at 96dpi
-      const scale = Math.min(targetWidth / target.offsetWidth, targetHeight / target.offsetHeight, 3); // 最大3倍まで
+      
+      // アスペクト比を保持してスケール計算
+      const targetAspectRatio = targetWidth / targetHeight;
+      const currentAspectRatio = target.offsetWidth / target.offsetHeight;
+      
+      let scale;
+      if (currentAspectRatio > targetAspectRatio) {
+        // 現在の方が横長 → 高さに合わせる
+        scale = targetHeight / target.offsetHeight;
+      } else {
+        // 現在の方が縦長 → 幅に合わせる
+        scale = targetWidth / target.offsetWidth;
+      }
+      
+      scale = Math.min(scale, 3); // 最大3倍まで
       
       const canvas = await html2canvas(target, {
         scale: scale,
@@ -164,8 +178,28 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         format: [shikishiWidth, shikishiHeight] 
       });
       
-      // キャンバスを色紙サイズに合わせて配置（余白なし）
-      pdf.addImage(imgData, "PNG", 0, 0, shikishiWidth, shikishiHeight, undefined, "FAST");
+      // キャンバスのアスペクト比を計算
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const shikishiAspectRatio = shikishiWidth / shikishiHeight;
+      
+      let imgWidth, imgHeight, x, y;
+      
+      if (canvasAspectRatio > shikishiAspectRatio) {
+        // キャンバスがより横長 → 幅に合わせて高さを調整
+        imgWidth = shikishiWidth;
+        imgHeight = shikishiWidth / canvasAspectRatio;
+        x = 0;
+        y = (shikishiHeight - imgHeight) / 2;
+      } else {
+        // キャンバスがより縦長 → 高さに合わせて幅を調整
+        imgHeight = shikishiHeight;
+        imgWidth = shikishiHeight * canvasAspectRatio;
+        x = (shikishiWidth - imgWidth) / 2;
+        y = 0;
+      }
+      
+      // キャンバスを色紙サイズに合わせて配置（アスペクト比保持）
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight, undefined, "FAST");
       
       console.log("PDFを保存中...");
       pdf.save(`okurun_${id}.pdf`);
@@ -181,12 +215,14 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
   return (
     <div>
       <StepBar current={3} />
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center space-y-6">
-        <Card className="p-6">
-          <div id="yosegaki-preview">
-            <PreviewBoard src={designSrc} cardType={cardType} />
+      <div className="max-w-7xl mx-auto px-4 py-10 text-center space-y-6">
+        <Card className="p-8">
+          <div className="flex justify-center">
+            <div id="yosegaki-preview" className="transform scale-75 sm:scale-90 md:scale-100">
+              <PreviewBoard src={designSrc} cardType={cardType} />
+            </div>
           </div>
-          <div className="mt-2 text-sm text-neutral-600">デザインプレビュー（ダミー）</div>
+          <div className="mt-4 text-sm text-neutral-600">デザインプレビュー</div>
         </Card>
 
         <div className="rounded-2xl border border-neutral-200 p-4 select-all">
