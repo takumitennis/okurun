@@ -11,11 +11,14 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
   const { id } = use(params);
   const url = `https://okurun.jp/b/${id}`;
   const [designSrc, setDesignSrc] = useState<string | undefined>(undefined);
+  const [cardType, setCardType] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const src = localStorage.getItem("okurun:designSrc") || undefined;
+      const card = localStorage.getItem("okurun:cardType");
       setDesignSrc(src);
+      setCardType(card);
     }
   }, []);
 
@@ -57,7 +60,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       <div className="max-w-3xl mx-auto px-4 py-10 text-center space-y-6">
         <Card className="p-6">
           <div id="yosegaki-preview">
-            <PreviewBoard src={designSrc} cardType={"simple"} />
+            <PreviewBoard src={designSrc} cardType={cardType} />
           </div>
           <div className="mt-2 text-sm text-neutral-600">デザインプレビュー（ダミー）</div>
         </Card>

@@ -41,10 +41,20 @@ export default function CardPage() {
     }
   }, []);
 
-  const chooseCard = (id: string) => {
+  const chooseCard = (id: string, isConfirm = false) => {
     setCardType(id);
     if (typeof window !== "undefined") {
       localStorage.setItem("okurun:cardType", id);
+      // カードのソースも保存
+      const card = cards.find(c => c.id === id);
+      if (card?.src) {
+        localStorage.setItem("okurun:cardSrc", card.src);
+      }
+    }
+    
+    // 「これにする」が押された場合は次へ進む
+    if (isConfirm) {
+      next();
     }
   };
 
@@ -70,8 +80,8 @@ export default function CardPage() {
               <img src={c.src} alt="カード" className="h-24 w-full object-contain rounded-xl border border-neutral-200 mb-3" />
               <div className="font-medium text-neutral-800 mb-2">{c.id}</div>
               <div className="flex justify-center gap-2">
-                <Button variant="outline" className="h-9 px-3" onClick={() => chooseCard(c.id)}>試す</Button>
-                <Button className="h-9 px-3" onClick={() => chooseCard(c.id)}>これにする</Button>
+                <Button variant="outline" className="h-9 px-3" onClick={() => chooseCard(c.id, false)}>試す</Button>
+                <Button className="h-9 px-3" onClick={() => chooseCard(c.id, true)}>これにする</Button>
               </div>
             </Card>
           ))}
