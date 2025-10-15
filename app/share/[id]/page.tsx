@@ -5,7 +5,7 @@ import StepBar from "../../../components/wizard/StepBar";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import Link from "next/link";
-import PreviewBoard from "../../../components/board/PreviewBoard";
+import BoardPreview from "../../../components/board/BoardPreview";
 
 export default function SharePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -226,8 +226,12 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       <div className="max-w-7xl mx-auto px-4 py-10 text-center space-y-6">
         <Card className="p-8">
           <div className="flex justify-center">
-            <div id="yosegaki-preview" className="transform scale-75 sm:scale-90 md:scale-100">
-              <PreviewBoard src={designSrc} cardType={cardType} />
+            <div className="transform scale-75 sm:scale-90 md:scale-100">
+              <BoardPreview 
+                messages={[]} 
+                designSrc={designSrc} 
+                cardSrc={cardType}
+              />
             </div>
           </div>
           <div className="mt-4 text-sm text-neutral-600">デザインプレビュー</div>

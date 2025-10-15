@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
-import PreviewBoard from "../../../components/board/PreviewBoard";
+import BoardPreview from "../../../components/board/BoardPreview";
 
 const MESSAGE_MAX = 200;
 
@@ -18,6 +18,139 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
   const [allMessages, setAllMessages] = useState<any[]>([]);
   const [isPublicPreview, setIsPublicPreview] = useState(false);
   const [designSrc, setDesignSrc] = useState<string | undefined>(undefined);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const loadScript = (src: string) =>
+    new Promise<void>((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) return resolve();
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error(`failed to load ${src}`));
+      document.body.appendChild(s);
+    });
+
+  const savePdf = async () => {
+    try {
+      setIsGeneratingPdf(true);
+      const target = document.getElementById("yosegaki-preview");
+      if (!target) {
+        alert("プレビューが見つかりません。ページを再読み込みしてください。");
+        return;
+      }
+
+      console.log("PDF生成を開始します...");
+      
+      // 画像の読み込みを待つ
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // すべての画像が読み込まれるまで待機
+      const images = target.querySelectorAll('img');
+      console.log(`Found ${images.length} images to wait for`);
+      
+      await Promise.all(Array.from(images).map(img => {
+        return new Promise<void>((resolve) => {
+          if (img.complete) {
+            resolve();
+          } else {
+            img.onload = () => resolve();
+            img.onerror = () => resolve(); // エラーでも続行
+          }
+        });
+      }));
+      
+      console.log("All images loaded, proceeding with PDF generation");
+      
+      // 動的にCDNから読み込み
+      await loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js");
+      await loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+      
+      const html2canvas = (window as any).html2canvas as (element: HTMLElement, options?: any) => Promise<HTMLCanvasElement>;
+      const { jsPDF } = (window as any).jspdf;
+
+      console.log("キャンバスを生成中...");
+      
+      // 色紙サイズに合わせてスケール計算
+      const targetWidth = 914; // 242mm in pixels at 96dpi
+      const targetHeight = 1032; // 273mm in pixels at 96dpi
+      
+      const targetAspectRatio = targetWidth / targetHeight;
+      const currentAspectRatio = target.offsetWidth / target.offsetHeight;
+      
+      let scale;
+      if (currentAspectRatio > targetAspectRatio) {
+        scale = targetHeight / target.offsetHeight;
+      } else {
+        scale = targetWidth / target.offsetWidth;
+      }
+      
+      scale = Math.min(scale, 5);
+      
+      const canvas = await html2canvas(target, {
+        scale: scale,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        allowTaint: true,
+        foreignObjectRendering: false,
+        imageTimeout: 30000,
+        removeContainer: false,
+        width: target.offsetWidth,
+        height: target.offsetHeight,
+        scrollX: 0,
+        scrollY: 0
+      });
+      
+      console.log("Canvas created:", {
+        width: canvas.width,
+        height: canvas.height
+      });
+
+      console.log("PDFを作成中...");
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      
+      // 色紙サイズ（24.2cm × 27.3cm）でPDFを作成
+      const shikishiWidth = 242; // mm
+      const shikishiHeight = 273; // mm
+      
+      const pdf = new jsPDF({ 
+        orientation: "portrait", 
+        unit: "mm", 
+        format: [shikishiWidth, shikishiHeight] 
+      });
+      
+      // キャンバスのアスペクト比を計算
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const shikishiAspectRatio = shikishiWidth / shikishiHeight;
+      
+      let imgWidth, imgHeight, x, y;
+      
+      if (canvasAspectRatio > shikishiAspectRatio) {
+        imgWidth = shikishiWidth;
+        imgHeight = shikishiWidth / canvasAspectRatio;
+        x = 0;
+        y = (shikishiHeight - imgHeight) / 2;
+      } else {
+        imgHeight = shikishiHeight;
+        imgWidth = shikishiHeight * canvasAspectRatio;
+        x = (shikishiWidth - imgWidth) / 2;
+        y = 0;
+      }
+      
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight, undefined, "MEDIUM");
+      
+      console.log("PDFを保存中...");
+      pdf.save(`okurun_${id}.pdf`);
+      
+      console.log("PDF保存が完了しました！");
+    } catch (error) {
+      console.error("PDF生成エラー:", error);
+      alert("PDFの生成に失敗しました。ブラウザを再読み込みして再度お試しください。");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -148,21 +281,21 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
             </form>
 
             <div className="space-y-3">
-              <div className="text-sm text-neutral-600">カードプレビュー（STEP2のカードタイプ: {cardType}）</div>
+              <div className="text-sm text-neutral-600">寄せ書きプレビュー</div>
               <Card className="p-4">
-                <div className="rounded-xl border border-neutral-200 bg-white p-4 min-h-32">
-                  {cardType === "photo" && (
-                    <div className="flex items-center justify-center mb-2">
-                      {photo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={photo} alt="your" className="h-16 w-16 rounded-md object-cover" />
-                      ) : (
-                        <div className="h-16 w-16 rounded-md bg-neutral-200" />
-                      )}
-                    </div>
-                  )}
-                  <div className="text-center font-semibold mb-2">{name || "あなたの名前"}</div>
-                  <div className="whitespace-pre-wrap text-neutral-800 text-sm text-center">{message || "ここにあなたのメッセージが入ります"}</div>
+                <div className="flex justify-center">
+                  <div className="transform scale-75">
+                    <BoardPreview 
+                      messages={name && message ? [{
+                        id: "preview",
+                        name: name,
+                        message: message,
+                        photo: photo
+                      }] : []} 
+                      designSrc={designSrc} 
+                      cardSrc={cardType}
+                    />
+                  </div>
                 </div>
               </Card>
             </div>
@@ -189,10 +322,23 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
             <Card className="p-6 space-y-4">
               <div className="text-lg font-semibold">みんなの寄せ書き（{allMessages.length}件のメッセージ）</div>
               <div className="flex justify-center">
-                <PreviewBoard src={designSrc} cardType={cardType} messages={allMessages} />
+                <BoardPreview 
+                  messages={allMessages} 
+                  designSrc={designSrc} 
+                  cardSrc={cardType}
+                />
+              </div>
+              <div className="flex justify-center gap-3">
+                <Button 
+                  onClick={savePdf}
+                  disabled={isGeneratingPdf}
+                  variant="primary"
+                >
+                  {isGeneratingPdf ? "生成中..." : "PDFとして保存"}
+                </Button>
               </div>
               <div className="text-sm text-neutral-600 text-center">
-                実際の寄せ書きは、STEP3の共有ページでPDFとして保存できます
+                実際の寄せ書きをPDFとして保存できます
               </div>
             </Card>
           )}
