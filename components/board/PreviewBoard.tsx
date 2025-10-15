@@ -54,6 +54,14 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
         <div className="absolute inset-0 bg-neutral-100" />
       )}
 
+      {/* 上部バナー（送り先の写真＋一言） */}
+      <div className="absolute left-3 right-3 top-3 bg-white/90 rounded-md shadow-sm border border-neutral-200 px-3 py-2 flex items-center gap-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full bg-neutral-300" />}
+        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis" suppressHydrationWarning>
+          {combined}
+        </div>
+      </div>
 
       {/* 中央カードプレビュー */}
       <div className="absolute inset-0 flex items-center justify-center px-4 pt-16">
@@ -63,7 +71,6 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
             <div className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cardSrc} alt="カードデザイン" className="w-full h-32 object-cover" />
-              <div className="absolute inset-0 bg-black/10" />
               <div className="absolute inset-0 p-4 flex items-center justify-center">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-3 mb-3">
@@ -72,11 +79,11 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
                     ) : (
                       <div className="h-10 w-10 rounded-md bg-white/80" />
                     )}
-                    <div className="font-semibold text-[13px] text-white drop-shadow-lg" suppressHydrationWarning>
+                    <div className="font-semibold text-[13px] text-black" suppressHydrationWarning>
                       {recipient || "山田さん"}
                     </div>
                   </div>
-                  <div className="text-[12px] leading-snug text-white drop-shadow-lg whitespace-pre-wrap" suppressHydrationWarning>
+                  <div className="text-[12px] leading-snug text-black whitespace-pre-wrap" suppressHydrationWarning>
                     {headline || "今まで本当にありがとうございました！"}
                   </div>
                 </div>
