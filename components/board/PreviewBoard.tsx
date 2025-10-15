@@ -55,10 +55,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
       )}
 
       {/* 上部バナー（送り先の写真＋一言） */}
-      <div className="absolute left-3 right-3 top-3 bg-white/90 rounded-md shadow-sm border border-neutral-200 px-3 py-2 flex items-center gap-2">
+      <div className="absolute left-3 right-3 top-3 px-3 py-2 flex items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full bg-neutral-300" />}
-        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis" suppressHydrationWarning>
+        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis text-black" suppressHydrationWarning>
           {combined}
         </div>
       </div>
