@@ -5,9 +5,15 @@ type Props = {
   src?: string | null;
   cardType?: string | null;
   bannerText?: string; // 例: 田中さん 卒業おめでとうございます！
+  messages?: Array<{
+    id: string;
+    name: string;
+    message: string;
+    photo?: string | null;
+  }>; // 実際のメッセージデータ
 };
 
-export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) {
+export default function PreviewBoard({ src, cardType, bannerText = "", messages = [] }: Props) {
   // PDF生成のために、初期状態から完全なデータを提供
   const [mounted, setMounted] = useState(false);
   const [recipient, setRecipient] = useState("山田さん");
@@ -105,8 +111,25 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
                       {headline}
                     </div>
                   </>
+                ) : messages[i - 1] ? (
+                  // 実際のメッセージデータがある場合
+                  <>
+                    {messages[i - 1].photo ? (
+                      <img src={messages[i - 1].photo} alt="" className="h-6 w-6 rounded-full object-cover mb-1" />
+                    ) : (
+                      <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
+                        <div className="h-3 w-3 rounded-full bg-accent" />
+                      </div>
+                    )}
+                    <div className="text-[9px] font-semibold text-black leading-tight">
+                      {messages[i - 1].name}
+                    </div>
+                    <div className="text-[8px] text-black leading-tight">
+                      {messages[i - 1].message}
+                    </div>
+                  </>
                 ) : i === 1 ? (
-                  // 2番目のカードはサンプルメッセージ
+                  // 2番目のカードはサンプルメッセージ（メッセージがない場合）
                   <>
                     <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
                       <div className="h-3 w-3 rounded-full bg-accent" />

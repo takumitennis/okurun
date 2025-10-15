@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
+import PreviewBoard from "../../../components/board/PreviewBoard";
 
 const MESSAGE_MAX = 200;
 
@@ -16,12 +17,16 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
   const [submitted, setSubmitted] = useState(false);
   const [allMessages, setAllMessages] = useState<any[]>([]);
   const [isPublicPreview, setIsPublicPreview] = useState(false);
+  const [designSrc, setDesignSrc] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCardType(localStorage.getItem("okurun:cardType") || "simple");
       // プレビュー公開設定を取得（デフォルトはfalse）
       setIsPublicPreview(localStorage.getItem("okurun:isPublicPreview") === "true");
+      // 色紙デザインを取得
+      const src = localStorage.getItem("okurun:designSrc");
+      if (src) setDesignSrc(src);
     }
   }, []);
 
@@ -179,33 +184,15 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
             </div>
           </Card>
 
-          {/* プレビュー公開設定が有効な場合のみ、全メッセージを表示 */}
-          {isPublicPreview && allMessages.length > 0 && (
+          {/* プレビュー公開設定が有効な場合のみ、寄せ書きプレビューを表示 */}
+          {isPublicPreview && (
             <Card className="p-6 space-y-4">
-              <div className="text-lg font-semibold">みんなのメッセージ（{allMessages.length}件）</div>
-              <div className="grid gap-3 max-h-96 overflow-y-auto">
-                {allMessages.map((msg, index) => (
-                  <div key={msg.id || index} className="border border-neutral-200 rounded-lg p-3 bg-neutral-50">
-                    <div className="flex items-center gap-3 mb-2">
-                      {msg.photo ? (
-                        <img 
-                          src={msg.photo} 
-                          alt="" 
-                          className="h-8 w-8 rounded-full object-cover" 
-                        />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-neutral-300" />
-                      )}
-                      <div className="font-semibold text-sm">{msg.name}</div>
-                      <div className="text-xs text-neutral-500 ml-auto">
-                        {new Date(msg.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="text-sm text-neutral-700 whitespace-pre-wrap">
-                      {msg.message}
-                    </div>
-                  </div>
-                ))}
+              <div className="text-lg font-semibold">みんなの寄せ書き（{allMessages.length}件のメッセージ）</div>
+              <div className="flex justify-center">
+                <PreviewBoard src={designSrc} cardType={cardType} messages={allMessages} />
+              </div>
+              <div className="text-sm text-neutral-600 text-center">
+                実際の寄せ書きは、STEP3の共有ページでPDFとして保存できます
               </div>
             </Card>
           )}
