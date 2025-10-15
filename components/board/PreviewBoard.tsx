@@ -154,8 +154,8 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
           alt="選択した色紙" 
           className="absolute inset-0 w-full h-full object-cover" 
           crossOrigin="anonymous"
-          onLoad={() => console.log("Background image loaded")}
-          onError={(e) => console.error("Background image failed to load:", e)}
+          onLoad={() => console.log("Background image loaded successfully:", src)}
+          onError={(e) => console.error("Background image failed to load:", src, e)}
         />
       ) : (
         <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #eff6ff, #ecfdf5)' }} />

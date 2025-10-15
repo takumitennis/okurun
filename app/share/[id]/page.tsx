@@ -26,6 +26,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
     if (typeof window !== "undefined") {
       const src = localStorage.getItem("okurun:designSrc") || undefined;
       const card = localStorage.getItem("okurun:cardType");
+      console.log("Design data from localStorage:", { src, card });
       setDesignSrc(src);
       setCardType(card);
     }
@@ -55,7 +56,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       
       // 画像の読み込みを待つ
       console.log("画像の読み込み完了を待機中...");
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       // すべての画像が読み込まれるまで待機
       const images = target.querySelectorAll('img');
@@ -113,16 +114,35 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         scale: scale,
         useCORS: true,
         backgroundColor: "#ffffff",
-        logging: false,
+        logging: true, // デバッグ用にログを有効化
         allowTaint: true,
-        foreignObjectRendering: true, // フォントレンダリング改善
-        imageTimeout: 15000,
+        foreignObjectRendering: false, // 画像表示のためにfalseに戻す
+        imageTimeout: 30000, // タイムアウトを延長
         removeContainer: false,
         width: target.offsetWidth,
         height: target.offsetHeight,
         scrollX: 0,
         scrollY: 0,
-        letterRendering: true, // 文字レンダリング最適化
+        onclone: (clonedDoc: Document) => {
+          console.log("Cloned document:", clonedDoc);
+          const clonedTarget = clonedDoc.getElementById("yosegaki-preview");
+          if (clonedTarget) {
+            console.log("Cloned target found:", clonedTarget);
+            // 画像の読み込み状態を確認
+            const clonedImages = clonedTarget.querySelectorAll('img');
+            console.log(`Cloned images found: ${clonedImages.length}`);
+            clonedImages.forEach((img, index) => {
+              console.log(`Image ${index}:`, {
+                src: img.src,
+                complete: img.complete,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight
+              });
+            });
+          } else {
+            console.error("Cloned target not found!");
+          }
+        },
         ignoreElements: (element: Element) => {
           // oklabカラー関数を使っている要素をスキップ
           const computedStyle = window.getComputedStyle(element);
@@ -132,20 +152,6 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
             return true;
           }
           return false;
-        },
-        onclone: (clonedDoc: Document) => {
-          console.log("Cloned document:", clonedDoc);
-          const clonedTarget = clonedDoc.getElementById("yosegaki-preview");
-          if (clonedTarget) {
-            console.log("Cloned target found:", clonedTarget);
-            // oklabカラー関数を通常のカラーに置換
-            const style = clonedTarget.style;
-            if (style.color && style.color.includes('oklab')) {
-              style.color = '#000000';
-            }
-          } else {
-            console.error("Cloned target not found!");
-          }
         }
       });
       
