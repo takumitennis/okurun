@@ -88,10 +88,17 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
       )}
 
       {/* 上部バナー（送り先の写真＋一言） */}
-      <div className="absolute left-3 right-3 top-4 px-3 py-3 flex items-center justify-center gap-2" style={{ paddingTop: '16px', paddingBottom: '12px' }}>
+      <div className="absolute left-3 right-3 top-3 px-4 py-3 flex items-center justify-center gap-2 rounded-lg" style={{ 
+        paddingTop: '12px', 
+        paddingBottom: '12px',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(4px)',
+        border: '1px solid rgba(255, 255, 255, 0.8)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+      }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full" style={{ backgroundColor: '#d1d5db' }} />}
-        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#000000', lineHeight: '1.3' }}>
+        <div className="text-[12px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.4' }}>
           {combined}
         </div>
       </div>
@@ -140,10 +147,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                             ) : (
                               <div className="h-5 w-5 rounded-full mb-1" style={{ backgroundColor: '#e5e7eb' }} />
                             )}
-                            <div className="text-[8px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.2' }}>
+                            <div className="text-[8px] font-semibold leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.3', wordBreak: 'break-all' }}>
                               {recipient}
                             </div>
-                            <div className="text-[7px] leading-tight text-center" style={{ color: '#000000', lineHeight: '1.1' }}>
+                            <div className="text-[7px] leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.2', wordBreak: 'break-all' }}>
                               {headline}
                             </div>
                           </>
@@ -157,10 +164,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                                 <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FF6B6B' }} />
                               </div>
                             )}
-                            <div className="text-[8px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.2' }}>
+                            <div className="text-[8px] font-semibold leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.3', wordBreak: 'break-all' }}>
                               {messages[globalIndex - 1].name}
                             </div>
-                            <div className="text-[7px] leading-tight text-center" style={{ color: '#000000', lineHeight: '1.1' }}>
+                            <div className="text-[7px] leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.2', wordBreak: 'break-all' }}>
                               {messages[globalIndex - 1].message}
                             </div>
                           </>
@@ -170,10 +177,10 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
                             <div className="h-5 w-5 rounded-full mb-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(255,107,107,0.2)' }}>
                               <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FF6B6B' }} />
                             </div>
-                            <div className="text-[8px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.2' }}>
+                            <div className="text-[8px] font-semibold leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.3', wordBreak: 'break-all' }}>
                               田中さん
                             </div>
-                            <div className="text-[7px] leading-tight text-center" style={{ color: '#000000', lineHeight: '1.1' }}>
+                            <div className="text-[7px] leading-tight text-center px-1" style={{ color: '#000000', lineHeight: '1.2', wordBreak: 'break-all' }}>
                               お疲れ様でした！
                             </div>
                           </>
