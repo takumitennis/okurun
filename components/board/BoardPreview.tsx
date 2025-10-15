@@ -179,7 +179,7 @@ export default function BoardPreview({
                   width: `${AVATAR_SIZE + 12}px`,
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
                   position: 'absolute',
-                  top: '-15px'
+                  top: '-12px'
                 }} 
               />
             ) : (
@@ -191,7 +191,7 @@ export default function BoardPreview({
                   backgroundColor: '#d1d5db',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
                   position: 'absolute',
-                  top: '-15px'
+                  top: '-12px'
                 }} 
               />
             )}
@@ -246,7 +246,7 @@ export default function BoardPreview({
                     width: `${AVATAR_SIZE + 12}px`,
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
                     position: 'absolute',
-                    top: '-15px'
+                    top: '-12px'
                   }} 
                 />
               ) : (
@@ -258,7 +258,7 @@ export default function BoardPreview({
                     backgroundColor: 'rgba(255,107,107,0.2)',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
                     position: 'absolute',
-                    top: '-15px'
+                    top: '-12px'
                   }}
                 >
                   <div className="rounded-full" style={{ 
