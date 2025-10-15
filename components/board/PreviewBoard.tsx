@@ -53,6 +53,24 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
   }, [cardType, mounted]);
 
   const combined = `${recipient ? `${recipient} ` : ""}${headline}`.trim();
+  
+  // 実際のメッセージ数を計算（受取人情報 + 投稿メッセージ数）
+  const totalMessageCount = 1 + (messages?.length || 0);
+  
+  // カード配置の計算
+  const getCardLayout = (count: number) => {
+    if (count <= 2) return { rows: 2, cols: 2, itemsPerRow: [count, 0] };
+    if (count <= 4) return { rows: 2, cols: 3, itemsPerRow: [2, Math.max(0, count - 2)] };
+    if (count <= 6) return { rows: 3, cols: 3, itemsPerRow: [2, 2, Math.max(0, count - 4)] };
+    if (count <= 8) return { rows: 3, cols: 3, itemsPerRow: [3, 3, Math.max(0, count - 6)] };
+    if (count <= 12) return { rows: 3, cols: 4, itemsPerRow: [4, 4, Math.max(0, count - 8)] };
+    if (count <= 16) return { rows: 4, cols: 4, itemsPerRow: [4, 4, 4, Math.max(0, count - 12)] };
+    // 20個以上は通常の4x5グリッド
+    return { rows: 5, cols: 4, itemsPerRow: [4, 4, 4, 4, 4] };
+  };
+  
+  const layout = getCardLayout(Math.min(totalMessageCount, 20));
+  
   return (
     <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273] bg-white" style={{ minHeight: '273px' }}>
       {src ? (
@@ -66,95 +84,115 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
           onError={(e) => console.error("Background image failed to load:", e)}
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #eff6ff, #ecfdf5)' }} />
       )}
 
       {/* 上部バナー（送り先の写真＋一言） */}
-      <div className="absolute left-3 right-3 top-3 px-3 py-2 flex items-center justify-center gap-2">
+      <div className="absolute left-3 right-3 top-4 px-3 py-3 flex items-center justify-center gap-2" style={{ paddingTop: '16px', paddingBottom: '12px' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full bg-neutral-300" />}
-        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#000000' }}>
+        {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full" style={{ backgroundColor: '#d1d5db' }} />}
+        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#000000', lineHeight: '1.3' }}>
           {combined}
         </div>
       </div>
 
-      {/* メッセージカード群（20カード分のグリッド） */}
-      <div className="absolute inset-0 grid grid-cols-4 grid-rows-5 gap-2 p-4 pt-16">
-        {Array.from({ length: 20 }).map((_, i) => {
-          // カードデザインを背景に適用
-          const cardStyle = cardSrc ? {
-            backgroundImage: `url(${cardSrc})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          } : {};
-          
-          return (
-            <div 
-              key={i} 
-              className="rounded-md shadow-sm border border-neutral-200 p-2 flex flex-col items-center justify-center text-center relative overflow-hidden"
-              style={cardStyle}
-            >
-              {/* カードデザインがある場合は薄いオーバーレイを追加 */}
-              {cardSrc && <div className="absolute inset-0 bg-white/80" />}
-              
-              <div className="relative z-10">
-                {i === 0 ? (
-                  // 最初のカードは受取人情報
-                  <>
-                    {mounted && photo ? (
-                      <img src={photo} alt="" className="h-6 w-6 rounded-full object-cover mb-1" />
-                    ) : (
-                      <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
-                    )}
-                    <div className="text-[9px] font-semibold leading-tight" style={{ color: '#000000' }}>
-                      {recipient}
-                    </div>
-                    <div className="text-[8px] leading-tight" style={{ color: '#000000' }}>
-                      {headline}
-                    </div>
-                  </>
-                ) : messages[i - 1] ? (
-                  // 実際のメッセージデータがある場合
-                  <>
-                    {messages[i - 1].photo ? (
-                      <img src={messages[i - 1].photo} alt="" className="h-6 w-6 rounded-full object-cover mb-1" />
-                    ) : (
-                      <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
-                        <div className="h-3 w-3 rounded-full bg-accent" />
+      {/* メッセージカード群（動的配置） */}
+      <div className="absolute inset-0 p-4" style={{ paddingTop: '60px' }}>
+        <div className="h-full flex flex-col justify-center gap-2">
+          {Array.from({ length: layout.rows }).map((_, rowIndex) => {
+            const itemsInRow = layout.itemsPerRow[rowIndex] || 0;
+            if (itemsInRow === 0) return null;
+            
+            return (
+              <div key={rowIndex} className="flex justify-center gap-2">
+                {Array.from({ length: itemsInRow }).map((_, colIndex) => {
+                  const globalIndex = layout.itemsPerRow.slice(0, rowIndex).reduce((sum, count) => sum + count, 0) + colIndex;
+                  
+                  // カードデザインを背景に適用
+                  const cardStyle = cardSrc ? {
+                    backgroundImage: `url(${cardSrc})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    borderColor: '#e5e7eb'
+                  } : { borderColor: '#e5e7eb' };
+                  
+                  return (
+                    <div 
+                      key={`${rowIndex}-${colIndex}`}
+                      className="rounded-md shadow-sm border p-2 flex flex-col items-center justify-center text-center relative overflow-hidden"
+                      style={{ 
+                        ...cardStyle, 
+                        width: '60px', 
+                        height: '70px',
+                        minWidth: '60px',
+                        minHeight: '70px'
+                      }}
+                    >
+                      {/* カードデザインがある場合は薄いオーバーレイを追加 */}
+                      {cardSrc && <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }} />}
+                      
+                      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
+                        {globalIndex === 0 ? (
+                          // 最初のカードは受取人情報
+                          <>
+                            {mounted && photo ? (
+                              <img src={photo} alt="" className="h-5 w-5 rounded-full object-cover mb-1" />
+                            ) : (
+                              <div className="h-5 w-5 rounded-full mb-1" style={{ backgroundColor: '#e5e7eb' }} />
+                            )}
+                            <div className="text-[8px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.2' }}>
+                              {recipient}
+                            </div>
+                            <div className="text-[7px] leading-tight text-center" style={{ color: '#000000', lineHeight: '1.1' }}>
+                              {headline}
+                            </div>
+                          </>
+                        ) : messages[globalIndex - 1] ? (
+                          // 実際のメッセージデータがある場合
+                          <>
+                            {messages[globalIndex - 1].photo ? (
+                              <img src={messages[globalIndex - 1].photo} alt="" className="h-5 w-5 rounded-full object-cover mb-1" />
+                            ) : (
+                              <div className="h-5 w-5 rounded-full mb-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(255,107,107,0.2)' }}>
+                                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FF6B6B' }} />
+                              </div>
+                            )}
+                            <div className="text-[8px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.2' }}>
+                              {messages[globalIndex - 1].name}
+                            </div>
+                            <div className="text-[7px] leading-tight text-center" style={{ color: '#000000', lineHeight: '1.1' }}>
+                              {messages[globalIndex - 1].message}
+                            </div>
+                          </>
+                        ) : globalIndex === 1 ? (
+                          // 2番目のカードはサンプルメッセージ（メッセージがない場合）
+                          <>
+                            <div className="h-5 w-5 rounded-full mb-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(255,107,107,0.2)' }}>
+                              <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FF6B6B' }} />
+                            </div>
+                            <div className="text-[8px] font-semibold leading-tight text-center" style={{ color: '#000000', lineHeight: '1.2' }}>
+                              田中さん
+                            </div>
+                            <div className="text-[7px] leading-tight text-center" style={{ color: '#000000', lineHeight: '1.1' }}>
+                              お疲れ様でした！
+                            </div>
+                          </>
+                        ) : (
+                          // その他のカードは空のプレースホルダー
+                          <>
+                            <div className="h-5 w-5 rounded-full mb-1" style={{ backgroundColor: '#e5e7eb' }} />
+                            <div className="h-1.5 w-full rounded mb-1" style={{ backgroundColor: '#e5e7eb' }} />
+                            <div className="h-1 w-3/4 rounded" style={{ backgroundColor: '#e5e7eb' }} />
+                          </>
+                        )}
                       </div>
-                    )}
-                    <div className="text-[9px] font-semibold leading-tight" style={{ color: '#000000' }}>
-                      {messages[i - 1].name}
                     </div>
-                    <div className="text-[8px] leading-tight" style={{ color: '#000000' }}>
-                      {messages[i - 1].message}
-                    </div>
-                  </>
-                ) : i === 1 ? (
-                  // 2番目のカードはサンプルメッセージ（メッセージがない場合）
-                  <>
-                    <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
-                      <div className="h-3 w-3 rounded-full bg-accent" />
-                    </div>
-                    <div className="text-[9px] font-semibold leading-tight" style={{ color: '#000000' }}>
-                      田中さん
-                    </div>
-                    <div className="text-[8px] leading-tight" style={{ color: '#000000' }}>
-                      お疲れ様でした！
-                    </div>
-                  </>
-                ) : (
-                  // その他のカードは空のプレースホルダー
-                  <>
-                    <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
-                    <div className="h-2 w-full bg-neutral-200 rounded mb-1" />
-                    <div className="h-1.5 w-3/4 bg-neutral-200 rounded" />
-                  </>
-                )}
+                  );
+                })}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
