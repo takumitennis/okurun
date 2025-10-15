@@ -55,7 +55,24 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       
       // 画像の読み込みを待つ
       console.log("画像の読み込み完了を待機中...");
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // すべての画像が読み込まれるまで待機
+      const images = target.querySelectorAll('img');
+      console.log(`Found ${images.length} images to wait for`);
+      
+      await Promise.all(Array.from(images).map(img => {
+        return new Promise<void>((resolve) => {
+          if (img.complete) {
+            resolve();
+          } else {
+            img.onload = () => resolve();
+            img.onerror = () => resolve(); // エラーでも続行
+          }
+        });
+      }));
+      
+      console.log("All images loaded, proceeding with PDF generation");
       
       // 動的にCDNから読み込み（npm依存なし）
       await loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js");
@@ -65,8 +82,16 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       const { jsPDF } = (window as any).jspdf;
 
       console.log("キャンバスを生成中...");
+      console.log("Target element:", target);
+      console.log("Target dimensions:", {
+        width: target.offsetWidth,
+        height: target.offsetHeight,
+        scrollWidth: target.scrollWidth,
+        scrollHeight: target.scrollHeight
+      });
+      
       const canvas = await html2canvas(target, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
         logging: true,
@@ -74,11 +99,45 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         foreignObjectRendering: true,
         imageTimeout: 15000,
         removeContainer: false,
-        width: target.scrollWidth,
-        height: target.scrollHeight,
+        width: target.offsetWidth,
+        height: target.offsetHeight,
         scrollX: 0,
         scrollY: 0,
+        onclone: (clonedDoc) => {
+          console.log("Cloned document:", clonedDoc);
+          const clonedTarget = clonedDoc.getElementById("yosegaki-preview");
+          if (clonedTarget) {
+            console.log("Cloned target found:", clonedTarget);
+            console.log("Cloned target styles:", window.getComputedStyle(clonedTarget));
+          } else {
+            console.error("Cloned target not found!");
+          }
+        }
       });
+      
+      console.log("Canvas created:", {
+        width: canvas.width,
+        height: canvas.height
+      });
+
+      // キャンバスの内容を確認
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const hasContent = Array.from(imageData.data).some(value => value !== 255);
+        console.log("Canvas has content:", hasContent);
+        
+        if (!hasContent) {
+          console.warn("Canvas appears to be blank!");
+          // デバッグ用にキャンバスをページに表示
+          canvas.style.border = "2px solid red";
+          canvas.style.position = "fixed";
+          canvas.style.top = "10px";
+          canvas.style.left = "10px";
+          canvas.style.zIndex = "9999";
+          document.body.appendChild(canvas);
+        }
+      }
 
       console.log("PDFを作成中...");
       const imgData = canvas.toDataURL("image/png", 1.0);

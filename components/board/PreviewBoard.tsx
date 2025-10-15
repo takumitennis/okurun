@@ -54,7 +54,7 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
 
   const combined = `${recipient ? `${recipient} ` : ""}${headline}`.trim();
   return (
-    <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273] bg-white">
+    <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273] bg-white" style={{ minHeight: '273px' }}>
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img 
@@ -62,6 +62,8 @@ export default function PreviewBoard({ src, cardType, bannerText = "", messages 
           alt="選択した色紙" 
           className="absolute inset-0 w-full h-full object-cover" 
           crossOrigin="anonymous"
+          onLoad={() => console.log("Background image loaded")}
+          onError={(e) => console.error("Background image failed to load:", e)}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50" />
