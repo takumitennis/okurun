@@ -107,7 +107,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         scale = targetWidth / target.offsetWidth;
       }
       
-      scale = Math.min(scale, 3); // 最大3倍まで
+      scale = Math.min(scale, 5); // 最大5倍まで（画質向上）
       
       const canvas = await html2canvas(target, {
         scale: scale,
@@ -115,13 +115,14 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         backgroundColor: "#ffffff",
         logging: false,
         allowTaint: true,
-        foreignObjectRendering: false,
+        foreignObjectRendering: true, // フォントレンダリング改善
         imageTimeout: 15000,
         removeContainer: false,
         width: target.offsetWidth,
         height: target.offsetHeight,
         scrollX: 0,
         scrollY: 0,
+        letterRendering: true, // 文字レンダリング最適化
         ignoreElements: (element: Element) => {
           // oklabカラー関数を使っている要素をスキップ
           const computedStyle = window.getComputedStyle(element);
@@ -166,6 +167,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
       }
 
       console.log("PDFを作成中...");
+      // 最高品質のPNGでエクスポート
       const imgData = canvas.toDataURL("image/png", 1.0);
       
       // 色紙サイズ（24.2cm × 27.3cm）でPDFを作成
@@ -198,8 +200,8 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
         y = 0;
       }
       
-      // キャンバスを色紙サイズに合わせて配置（アスペクト比保持）
-      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight, undefined, "FAST");
+      // キャンバスを色紙サイズに合わせて配置（アスペクト比保持、高品質）
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight, undefined, "MEDIUM");
       
       console.log("PDFを保存中...");
       pdf.save(`okurun_${id}.pdf`);
