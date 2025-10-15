@@ -59,8 +59,43 @@ export default function NewMessagePage() {
               <input className="w-full rounded-xl border border-neutral-300 px-3 py-2" value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="〇〇さん 卒業おめでとうございます！" />
             </div>
             <div>
-              <label className="block text-sm text-neutral-700 mb-1">写真</label>
-              <input type="file" accept="image/*" onChange={onFile} />
+              <label className="block text-sm text-neutral-700 mb-2">写真</label>
+              <div className="space-y-3">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={onFile} 
+                  id="photo-upload"
+                  className="hidden"
+                />
+                <label 
+                  htmlFor="photo-upload"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-neutral-300 rounded-xl cursor-pointer hover:border-brand hover:bg-brand/5 transition-colors"
+                >
+                  <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-sm font-medium text-neutral-700">
+                    写真を選択
+                  </span>
+                </label>
+                {photo && (
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm text-green-700 font-medium">写真が選択されています</span>
+                    </div>
+                    <button
+                      onClick={() => setPhoto(null)}
+                      className="text-xs text-green-600 hover:text-green-800 underline"
+                    >
+                      削除
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex justify-end">
               <Button onClick={save}>保存して次へ</Button>
