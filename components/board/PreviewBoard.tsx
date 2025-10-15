@@ -55,7 +55,7 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
       )}
 
       {/* 上部バナー（送り先の写真＋一言） */}
-      <div className="absolute left-3 right-3 top-3 px-3 py-2 flex items-center gap-2">
+      <div className="absolute left-3 right-3 top-3 px-3 py-2 flex items-center justify-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full bg-neutral-300" />}
         <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis text-black" suppressHydrationWarning>
@@ -63,50 +63,48 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
         </div>
       </div>
 
-      {/* 中央カードプレビュー */}
-      <div className="absolute inset-0 flex items-center justify-center px-4 pt-16">
-        <div className="w-full max-w-[360px] rounded-lg shadow-md border border-neutral-200 overflow-hidden">
-          {/* カードデザインを背景に適用 */}
-          {cardSrc ? (
-            <div className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cardSrc} alt="カードデザイン" className="w-full h-32 object-cover" />
-              <div className="absolute inset-0 p-4 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    {mounted && photo ? (
-                      <img src={photo} alt="" className="h-10 w-10 rounded-md object-cover" />
-                    ) : (
-                      <div className="h-10 w-10 rounded-md bg-white/80" />
-                    )}
-                    <div className="font-semibold text-[13px] text-black" suppressHydrationWarning>
-                      {recipient || "山田さん"}
-                    </div>
-                  </div>
-                  <div className="text-[12px] leading-snug text-black whitespace-pre-wrap" suppressHydrationWarning>
-                    {headline || "今まで本当にありがとうございました！"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white/95 p-4">
-              <div className="flex items-center gap-3 mb-3">
+      {/* メッセージカード群（20カード分のグリッド） */}
+      <div className="absolute inset-0 grid grid-cols-4 grid-rows-5 gap-2 p-4 pt-16">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="bg-white/95 rounded-md shadow-sm border border-neutral-200 p-2 flex flex-col items-center justify-center text-center">
+            {i === 0 ? (
+              // 最初のカードは受取人情報
+              <>
                 {mounted && photo ? (
-                  <img src={photo} alt="" className="h-10 w-10 rounded-md object-cover" />
+                  <img src={photo} alt="" className="h-6 w-6 rounded-full object-cover mb-1" />
                 ) : (
-                  <div className="h-10 w-10 rounded-md bg-neutral-200" />
+                  <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
                 )}
-                <div className="font-semibold text-[13px] text-black" suppressHydrationWarning>
+                <div className="text-[9px] font-semibold text-black leading-tight" suppressHydrationWarning>
                   {recipient || "山田さん"}
                 </div>
-              </div>
-              <div className="text-[12px] leading-snug text-black whitespace-pre-wrap" suppressHydrationWarning>
-                {headline || "今まで本当にありがとうございました！"}
-              </div>
-            </div>
-          )}
-        </div>
+                <div className="text-[8px] text-black leading-tight" suppressHydrationWarning>
+                  {headline || "今まで本当にありがとうございました！"}
+                </div>
+              </>
+            ) : i === 1 ? (
+              // 2番目のカードはサンプルメッセージ
+              <>
+                <div className="h-6 w-6 rounded-full bg-accent/20 mb-1 flex items-center justify-center">
+                  <div className="h-3 w-3 rounded-full bg-accent" />
+                </div>
+                <div className="text-[9px] font-semibold text-black leading-tight">
+                  田中さん
+                </div>
+                <div className="text-[8px] text-black leading-tight">
+                  お疲れ様でした！
+                </div>
+              </>
+            ) : (
+              // その他のカードは空のプレースホルダー
+              <>
+                <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
+                <div className="h-2 w-full bg-neutral-200 rounded mb-1" />
+                <div className="h-1.5 w-3/4 bg-neutral-200 rounded" />
+              </>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
