@@ -14,10 +14,14 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
   const [photo, setPhoto] = useState<string | null>(null);
   const [cardType, setCardType] = useState<string>("simple");
   const [submitted, setSubmitted] = useState(false);
+  const [allMessages, setAllMessages] = useState<any[]>([]);
+  const [isPublicPreview, setIsPublicPreview] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCardType(localStorage.getItem("okurun:cardType") || "simple");
+      // プレビュー公開設定を取得（デフォルトはfalse）
+      setIsPublicPreview(localStorage.getItem("okurun:isPublicPreview") === "true");
     }
   }, []);
 
@@ -53,6 +57,20 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
       if (result.success) {
         console.log("メッセージ投稿成功:", result);
         setSubmitted(true);
+        
+        // プレビュー公開設定が有効な場合は、全メッセージを取得
+        if (isPublicPreview) {
+          try {
+            const messagesResponse = await fetch(`/api/messages?boardId=${id}`);
+            const messagesResult = await messagesResponse.json();
+            if (messagesResult.success) {
+              setAllMessages(messagesResult.messages);
+            }
+          } catch (error) {
+            console.error("メッセージ取得エラー:", error);
+          }
+        }
+        
         setName("");
         setMessage("");
         setPhoto(null);
@@ -148,16 +166,59 @@ export default function BoardInputPage({ params }: { params: Promise<{ id: strin
           <div className="text-sm text-neutral-500">ボードID: {id}</div>
         </>
       ) : (
-        <Card className="p-6 space-y-3">
-          <div className="text-lg font-semibold">ご入力ありがとうございました！</div>
-          <div className="text-sm text-neutral-600">あなたのメッセージは寄せ書きに反映されました。</div>
-          <div className="flex gap-2">
-            <Link href={`/share/${id}`}><Button variant="outline">共有ページへ戻る</Button></Link>
-            {typeof window !== "undefined" && localStorage.getItem("okurun:isAdmin") === "true" && (
-              <Link href="/me"><Button>管理画面へ</Button></Link>
-            )}
-          </div>
-        </Card>
+        <div className="space-y-6">
+          {/* お礼メッセージ */}
+          <Card className="p-6 space-y-3">
+            <div className="text-lg font-semibold">ご入力ありがとうございました！</div>
+            <div className="text-sm text-neutral-600">あなたのメッセージは寄せ書きに反映されました。</div>
+            <div className="flex gap-2">
+              <Link href={`/share/${id}`}><Button variant="outline">共有ページへ戻る</Button></Link>
+              {typeof window !== "undefined" && localStorage.getItem("okurun:isAdmin") === "true" && (
+                <Link href="/me"><Button>管理画面へ</Button></Link>
+              )}
+            </div>
+          </Card>
+
+          {/* プレビュー公開設定が有効な場合のみ、全メッセージを表示 */}
+          {isPublicPreview && allMessages.length > 0 && (
+            <Card className="p-6 space-y-4">
+              <div className="text-lg font-semibold">みんなのメッセージ（{allMessages.length}件）</div>
+              <div className="grid gap-3 max-h-96 overflow-y-auto">
+                {allMessages.map((msg, index) => (
+                  <div key={msg.id || index} className="border border-neutral-200 rounded-lg p-3 bg-neutral-50">
+                    <div className="flex items-center gap-3 mb-2">
+                      {msg.photo ? (
+                        <img 
+                          src={msg.photo} 
+                          alt="" 
+                          className="h-8 w-8 rounded-full object-cover" 
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-neutral-300" />
+                      )}
+                      <div className="font-semibold text-sm">{msg.name}</div>
+                      <div className="text-xs text-neutral-500 ml-auto">
+                        {new Date(msg.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-sm text-neutral-700 whitespace-pre-wrap">
+                      {msg.message}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* プレビュー公開設定が無効な場合の説明 */}
+          {!isPublicPreview && (
+            <Card className="p-6 space-y-3 bg-blue-50 border-blue-200">
+              <div className="text-sm text-blue-800">
+                💡 管理者が「全員にプレビューを公開する」にチェックを入れると、みんなのメッセージが見えるようになります。
+              </div>
+            </Card>
+          )}
+        </div>
       )}
     </div>
   );

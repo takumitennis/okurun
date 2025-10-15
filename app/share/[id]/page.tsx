@@ -13,6 +13,7 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
   const [cardType, setCardType] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [url, setUrl] = useState<string>("");
+  const [isPublicPreview, setIsPublicPreview] = useState(false);
 
   useEffect(() => {
     // クライアントサイドで環境を判定
@@ -112,34 +113,54 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
           <div className="font-mono text-neutral-800 break-all">{url}</div>
         </div>
 
-        <div className="flex items-center justify-center gap-3">
-          <Link href={`/b/${id}`}>
-            <Button className="px-6 py-2">入力する</Button>
-          </Link>
-          <Button 
-            variant="outline" 
-            className="px-6 py-2" 
-            onClick={savePdf}
-            disabled={isGeneratingPdf}
-          >
-            {isGeneratingPdf ? "生成中..." : "PDFとして保存"}
-          </Button>
-          <a
-            className="px-3 py-2 rounded-2xl border border-accent text-accent hover:bg-accent/10"
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("寄せ書きを書いてね！")}&url=${encodeURIComponent(url)}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Twitter
-          </a>
-          <a
-            className="px-3 py-2 rounded-2xl border border-accent text-accent hover:bg-accent/10"
-            href={`https://line.me/R/msg/text/?${encodeURIComponent(url)}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            LINE
-          </a>
+        <div className="space-y-4">
+          {/* プレビュー公開設定 */}
+          <div className="flex items-center justify-center gap-2">
+            <input
+              type="checkbox"
+              id="public-preview"
+              checked={isPublicPreview}
+              onChange={(e) => {
+                setIsPublicPreview(e.target.checked);
+                localStorage.setItem("okurun:isPublicPreview", e.target.checked.toString());
+              }}
+              className="rounded border-neutral-300 text-brand focus:ring-brand"
+            />
+            <label htmlFor="public-preview" className="text-sm text-neutral-700">
+              全員にプレビューを公開する
+            </label>
+          </div>
+
+          {/* アクションボタン */}
+          <div className="flex items-center justify-center gap-3">
+            <Link href={`/b/${id}`}>
+              <Button className="px-6 py-2">入力する</Button>
+            </Link>
+            <Button 
+              variant="outline" 
+              className="px-6 py-2" 
+              onClick={savePdf}
+              disabled={isGeneratingPdf}
+            >
+              {isGeneratingPdf ? "生成中..." : "PDFとして保存"}
+            </Button>
+            <a
+              className="px-3 py-2 rounded-2xl border border-accent text-accent hover:bg-accent/10"
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("寄せ書きを書いてね！")}&url=${encodeURIComponent(url)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Twitter
+            </a>
+            <a
+              className="px-3 py-2 rounded-2xl border border-accent text-accent hover:bg-accent/10"
+              href={`https://line.me/R/msg/text/?${encodeURIComponent(url)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              LINE
+            </a>
+          </div>
         </div>
       </div>
     </div>
