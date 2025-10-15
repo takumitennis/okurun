@@ -10,6 +10,21 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Cyan Coral Theme */
+  --color-brand: #00B8D9;
+  --color-brand-light: #33C7E2;
+  --color-brand-dark: #0092BD;
+  --color-accent: #FF6B6B;
+  --color-accent-light: #FFA3A3;
+  --color-accent-dark: #E25050;
+  --color-neutral-100: #F9FAFB;
+  --color-neutral-200: #F3F4F6;
+  --color-neutral-300: #E5E7EB;
+  --color-neutral-400: #9CA3AF;
+  --color-neutral-600: #4B5563;
+  --color-neutral-800: #1F2937;
+  --color-neutral-900: #111827;
 }
 
 @media (prefers-color-scheme: dark) {

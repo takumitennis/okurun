@@ -29,8 +29,65 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy (.dev)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This repo is prepared for Vercel Preview → Production with `.dev` domains.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1) Import to Vercel
+- Push to GitHub, then Vercel → New Project → Import repo (Next.js auto-detected)
+- Default build (Node 20 / Turbopack)
+- Preview URL will be `*.vercel.app`
+
+### 2) Domains
+- Start with `*.vercel.app` (Preview)
+- When ready: add domains to Vercel → Domains
+  - Preview: `dev.okurun.dev`
+  - Production: `okurun.dev`
+- DNS: create CNAME records
+  - `dev.okurun.dev` → `cname.vercel-dns.com`
+  - `okurun.dev` → `cname.vercel-dns.com`
+  - .dev is HTTPS-only (HSTS); use SSL in Vercel (default)
+
+### 3) Env Vars (Vercel → Settings → Environment Variables)
+Create the following for Preview & Production (no secrets committed):
+
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+```
+
+### 4) Firebase Authentication – Authorized domains
+- Add: `dev.okurun.dev`, `okurun.dev`, `*.vercel.app`
+- OAuth Redirect URIs (if used):
+  - https://dev.okurun.dev/api/auth/callback/google
+  - https://okurun.dev/api/auth/callback/google
+
+### 5) Images and CORS
+- Prefer same-origin images for html2canvas.
+- If serving from Firebase Storage, set CORS as shown in `cors.json` then run:
+
+```
+gsutil cors set cors.json gs://<YOUR_FIREBASE_STORAGE_BUCKET>
+gsutil cors get gs://<YOUR_FIREBASE_STORAGE_BUCKET>
+```
+
+### 6) Local build
+
+```
+npm i
+npm run build
+npm start
+```
+
+Ensure routes render: `/`, `/designs`, `/new/paper`, `/new/message`, `/new/card`, `/share/<id>`, `/b/<id>`.
+
+### UI note
+- Message card components should keep outer margins minimal (0–6px). We will tune later.
