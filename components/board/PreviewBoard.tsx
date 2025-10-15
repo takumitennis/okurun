@@ -8,21 +8,23 @@ type Props = {
 };
 
 export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) {
-  // Hydration差異を避けるため、初期レンダーは bannerText のみを描画し、
-  // マウント後に localStorage の値で更新する。
-  // 初期レンダーは完全に静的（空）→ マウント後に値を同期
+  // PDF生成のために、初期状態から完全なデータを提供
   const [mounted, setMounted] = useState(false);
-  const [recipient, setRecipient] = useState("");
-  const [headline, setHeadline] = useState("");
+  const [recipient, setRecipient] = useState("山田さん");
+  const [headline, setHeadline] = useState("今まで本当にありがとうございました！");
   const [photo, setPhoto] = useState<string | null>(null);
   const [cardSrc, setCardSrc] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
-      setRecipient(localStorage.getItem("okurun:recipient") || "");
-      setHeadline(localStorage.getItem("okurun:headline") || "");
-      setPhoto(localStorage.getItem("okurun:recipientPhoto"));
+      const savedRecipient = localStorage.getItem("okurun:recipient");
+      const savedHeadline = localStorage.getItem("okurun:headline");
+      const savedPhoto = localStorage.getItem("okurun:recipientPhoto");
+      
+      if (savedRecipient) setRecipient(savedRecipient);
+      if (savedHeadline) setHeadline(savedHeadline);
+      if (savedPhoto) setPhoto(savedPhoto);
     }
   }, []);
 
@@ -44,21 +46,26 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
     }
   }, [cardType, mounted]);
 
-  const combined = mounted ? `${recipient ? `${recipient} ` : ""}${headline}`.trim() : "";
+  const combined = `${recipient ? `${recipient} ` : ""}${headline}`.trim();
   return (
-    <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273]">
+    <div className="relative mx-auto w-full max-w-[480px] aspect-[242/273] bg-white">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="選択した色紙" className="absolute inset-0 w-full h-full object-cover" />
+        <img 
+          src={src} 
+          alt="選択した色紙" 
+          className="absolute inset-0 w-full h-full object-cover" 
+          crossOrigin="anonymous"
+        />
       ) : (
-        <div className="absolute inset-0 bg-neutral-100" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50" />
       )}
 
       {/* 上部バナー（送り先の写真＋一言） */}
       <div className="absolute left-3 right-3 top-3 px-3 py-2 flex items-center justify-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {mounted && photo ? <img src={photo} alt="" className="rounded-full h-8 w-8 object-cover" /> : <div className="h-8 w-8 rounded-full bg-neutral-300" />}
-        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis text-black" suppressHydrationWarning>
+        <div className="text-[11px] font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis text-black">
           {combined}
         </div>
       </div>
@@ -91,11 +98,11 @@ export default function PreviewBoard({ src, cardType, bannerText = "" }: Props) 
                     ) : (
                       <div className="h-6 w-6 rounded-full bg-neutral-200 mb-1" />
                     )}
-                    <div className="text-[9px] font-semibold text-black leading-tight" suppressHydrationWarning>
-                      {recipient || "山田さん"}
+                    <div className="text-[9px] font-semibold text-black leading-tight">
+                      {recipient}
                     </div>
-                    <div className="text-[8px] text-black leading-tight" suppressHydrationWarning>
-                      {headline || "今まで本当にありがとうございました！"}
+                    <div className="text-[8px] text-black leading-tight">
+                      {headline}
                     </div>
                   </>
                 ) : i === 1 ? (

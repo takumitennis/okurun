@@ -45,6 +45,10 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
 
       console.log("PDF生成を開始します...");
       
+      // 画像の読み込みを待つ
+      console.log("画像の読み込み完了を待機中...");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       // 動的にCDNから読み込み（npm依存なし）
       await loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js");
       await loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
@@ -54,12 +58,18 @@ export default function SharePage({ params }: { params: Promise<{ id: string }> 
 
       console.log("キャンバスを生成中...");
       const canvas = await html2canvas(target, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         backgroundColor: "#ffffff",
-        logging: false,
+        logging: true,
         allowTaint: true,
         foreignObjectRendering: true,
+        imageTimeout: 15000,
+        removeContainer: false,
+        width: target.scrollWidth,
+        height: target.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
       });
 
       console.log("PDFを作成中...");
