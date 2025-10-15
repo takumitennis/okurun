@@ -140,7 +140,8 @@ export default function BoardPreview({
       <div 
         className="absolute inset-0 p-4"
         style={{ 
-          paddingTop: '70px',
+          paddingTop: '90px',
+          paddingBottom: '20px',
           display: 'grid',
           gridTemplateColumns: `repeat(${cols}, ${CARD_WIDTH}px)`,
           gap: `${gap}px`,
@@ -151,7 +152,7 @@ export default function BoardPreview({
       >
         {/* 受取人カード（最初のカード） */}
         <div 
-          className="relative rounded-2xl shadow-lg flex flex-col items-center justify-center p-3 text-neutral-800 overflow-hidden"
+          className="relative rounded-2xl shadow-lg flex flex-col items-center justify-center p-3 text-neutral-800"
           style={{
             width: `${CARD_WIDTH}px`,
             height: `${CARD_HEIGHT}px`,
@@ -160,7 +161,8 @@ export default function BoardPreview({
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             border: '1px solid rgba(255, 255, 255, 0.8)',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            marginTop: '20px'
           }}
         >
           {/* カードデザインがある場合は薄いオーバーレイ */}
@@ -217,7 +219,7 @@ export default function BoardPreview({
         {messages.map((message, index) => (
           <div 
             key={message.id}
-            className="relative rounded-2xl shadow-lg flex flex-col items-center justify-center p-3 text-neutral-800 overflow-hidden"
+            className="relative rounded-2xl shadow-lg flex flex-col items-center justify-center p-3 text-neutral-800"
             style={{
               width: `${CARD_WIDTH}px`,
               height: `${CARD_HEIGHT}px`,
@@ -226,7 +228,8 @@ export default function BoardPreview({
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               border: '1px solid rgba(255, 255, 255, 0.8)',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              marginTop: '20px'
             }}
           >
             {/* カードデザインがある場合は薄いオーバーレイ */}
