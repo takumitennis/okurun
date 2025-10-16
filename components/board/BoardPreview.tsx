@@ -122,19 +122,29 @@ export default function BoardPreview({
 
       {/* 上部バナー */}
       <div className="absolute left-4 right-4 top-4 px-3 py-2 flex justify-center" style={{ paddingTop: '20px' }}>
-        <div className="flex items-center gap-6" style={{ width: 'calc(5/7 * (100% - 32px))' }}>
+        <div className="flex flex-col items-center gap-3" style={{ width: 'calc(3/4 * (100% - 32px))' }}>
           {mounted && localPhoto ? (
-            <img src={localPhoto} alt="" className="rounded-full object-cover flex-shrink-0" style={{ height: '80px', width: '80px' }} />
+            <img src={localPhoto} alt="" className="rounded-full object-cover" style={{ height: '60px', width: '60px' }} />
           ) : (
-            <div className="rounded-full flex-shrink-0" style={{ backgroundColor: '#d1d5db', height: '80px', width: '80px' }} />
+            <div className="rounded-full" style={{ backgroundColor: '#d1d5db', height: '60px', width: '60px' }} />
           )}
-          <div className="font-semibold leading-tight flex-1" style={{ 
+          <div className="font-semibold leading-tight text-center" style={{ 
             color: '#000000', 
             lineHeight: '1.4',
             textShadow: '1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(255,255,255,0.8), 1px -1px 2px rgba(255,255,255,0.8), -1px 1px 2px rgba(255,255,255,0.8)',
-            fontSize: '28px'
+            fontSize: '24px',
+            width: '100%'
           }}>
-            {combined}
+            {localRecipient}
+          </div>
+          <div className="font-medium leading-tight text-center" style={{ 
+            color: '#000000', 
+            lineHeight: '1.4',
+            textShadow: '1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(255,255,255,0.8), 1px -1px 2px rgba(255,255,255,0.8), -1px 1px 2px rgba(255,255,255,0.8)',
+            fontSize: '18px',
+            width: '100%'
+          }}>
+            {localHeadline.length > 20 ? localHeadline.substring(0, 20) : localHeadline}
           </div>
         </div>
       </div>
@@ -143,7 +153,7 @@ export default function BoardPreview({
       <div 
         className="absolute inset-0 p-4"
         style={{ 
-          paddingTop: '140px',
+          paddingTop: '180px',
           paddingBottom: '20px',
           display: 'grid',
           gridTemplateColumns: `repeat(${cols}, ${CARD_WIDTH}px)`,

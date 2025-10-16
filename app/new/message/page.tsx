@@ -3,6 +3,7 @@
 import StepBar from "../../../components/wizard/StepBar";
 import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
+import BoardPreview from "../../../components/board/BoardPreview";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -55,8 +56,17 @@ export default function NewMessagePage() {
               <input className="w-full rounded-xl border border-neutral-300 px-3 py-2" value={recipient} onChange={(e) => setRecipient(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm text-neutral-700 mb-1">送り出す人へのメッセージ（上部に大きく表示）</label>
-              <input className="w-full rounded-xl border border-neutral-300 px-3 py-2" value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="〇〇さん 卒業おめでとうございます！" />
+              <label className="block text-sm text-neutral-700 mb-1">送り出す人へのメッセージ（上部に大きく表示・20文字以内）</label>
+              <input 
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2" 
+                value={headline} 
+                onChange={(e) => setHeadline(e.target.value)} 
+                placeholder="〇〇さん 卒業おめでとうございます！" 
+                maxLength={20}
+              />
+              <div className="text-xs text-neutral-500 text-right mt-1">
+                {headline.length}/20
+              </div>
             </div>
             <div>
               <label className="block text-sm text-neutral-700 mb-2">写真</label>
@@ -102,18 +112,17 @@ export default function NewMessagePage() {
             </div>
           </Card>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="text-sm text-neutral-600">プレビュー</div>
-          <Card className="p-6 flex items-center gap-3">
-            {photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={photo} alt="recipient" className="h-16 w-16 rounded-full object-cover" />
-            ) : (
-              <div className="h-16 w-16 rounded-full bg-neutral-200" />
-            )}
-            <div>
-              <div className="text-sm text-neutral-600 whitespace-nowrap overflow-hidden text-ellipsis">
-                {(recipient || "（未入力）") + (headline ? ` ${headline}` : "")}
+          <Card className="p-4">
+            <div className="flex justify-center">
+              <div className="transform scale-75">
+                <BoardPreview 
+                  messages={[]} 
+                  recipient={recipient || "（未入力）"} 
+                  headline={headline || ""} 
+                  recipientPhoto={photo}
+                />
               </div>
             </div>
           </Card>
